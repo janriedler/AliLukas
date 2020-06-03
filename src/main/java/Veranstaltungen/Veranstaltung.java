@@ -4,7 +4,7 @@ package Veranstaltungen;
  * logisch eigentlich
  */
 
-public class Veranstaltung {
+public class Veranstaltung implements Comparable<Veranstaltung> {
 
     private Long id;
     private String ver_name;
@@ -101,6 +101,11 @@ public class Veranstaltung {
         return ranking;
     }
 
+    public int getRankingInt() {
+        int wert = Integer.parseInt(getRanking());
+        return wert;
+    }
+
     public void setRanking(String ranking) {
         this.ranking = ranking;
     }
@@ -115,4 +120,8 @@ public class Veranstaltung {
 
     }
 
+    @Override
+    public int compareTo(Veranstaltung o) {
+        return Integer.compare(Integer.parseInt(this.getRanking()), Integer.parseInt(o.getRanking()));
+    }
 }

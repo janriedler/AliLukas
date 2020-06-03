@@ -39,8 +39,18 @@ public class Main {
         while (ver.size() > 20) {
             ver.remove(0);
         }
-
         model.addAttribute("veranstaltungen", future);
+
+
+
+        List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
+        List<Veranstaltung> top= new ArrayList<>();
+        if (tmp.size() > 0) top.add(tmp.get(0));
+        if (tmp.size() > 1) top.add(tmp.get(1));
+        if (tmp.size() > 2) top.add(tmp.get(2));
+
+        System.out.println(top.get(0));
+        model.addAttribute("top3", top);
         return "verlist";
     }
 
@@ -121,6 +131,33 @@ public class Main {
         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(pDateString);
         return new Date().before(date);
     }
+
+
+    /**
+     * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten das ein die Vera. ID und
+     * das das ranking um eins eröht werden soll. Dies geschieht hier.
+     */
+    @RequestMapping("voteUp")
+    public String up (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException, IOException {
+
+        long tmp = Long.parseLong(id);
+        repository.voteUp(tmp, ranking);
+        return showAll(model);
+    }
+
+    /**
+     * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten das ein die Vera. ID und
+     * das das ranking um eins eröht werden soll. Dies geschieht hier.
+     */
+    @RequestMapping("voteDown")
+    public String down (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException, IOException {
+
+        long tmp = Long.parseLong(id);
+        repository.voteDown(tmp, ranking);
+        return showAll(model);
+    }
+
+
 
 
 

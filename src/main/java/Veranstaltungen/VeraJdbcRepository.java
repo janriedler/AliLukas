@@ -3,6 +3,8 @@ package Veranstaltungen;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -35,15 +37,26 @@ public class VeraJdbcRepository {
     }
 
     public List < Veranstaltung > findAll() {
-        return jdbcTemplate.query("select * from Veranstaltung", new VeranstaltungRowMapper());
+        return findAllSort();
 
     }
 
+    public List < Veranstaltung > findAllSort() {
+        System.out.println("So oft werde ich ausgeführt");
+        List<Veranstaltung> old = new ArrayList<>(
+                jdbcTemplate.query("select * from Veranstaltung", new VeranstaltungRowMapper()));
+        old.sort(Comparator.comparing(Veranstaltung::getRankingInt).reversed());
+        return old;
+    }
+
     public List < Veranstaltung > findType(String type) {
-        return jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE ART =? ", new Object[] {
+        List<Veranstaltung> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE ART =? ", new Object[] {
                 type
         },
                 new VeranstaltungRowMapper());
+
+        old.sort(Comparator.comparing(Veranstaltung::getRankingInt).reversed());
+        return old;
 
     }
 
