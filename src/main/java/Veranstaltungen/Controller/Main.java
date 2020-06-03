@@ -40,8 +40,10 @@ public class Main {
                 future.add(veranstaltung);
             }
         }
-        while (ver.size() > 20) {
-            ver.remove(0);
+
+        //Damit werden nur die letzt 20 Einträge wiedergegeben
+        while (future.size() > 20) {
+            future.remove(0);
         }
         model.addAttribute("veranstaltungen", future);
 
@@ -91,7 +93,8 @@ public class Main {
         List<Veranstaltung> ver = new ArrayList<>();
         if (sort.equals("Alle (auch Vergangenheit)")) {
             ver.addAll(repository.findAll());
-            while (ver.size() > 20) { //noch nicht getestest
+            //Damit werden nur die letzt 20 Einträge wiedergegeben
+            while (ver.size() > 20) {
                 ver.remove(0);
             }
             model.addAttribute("veranstaltungen", ver);

@@ -78,7 +78,7 @@ public class VeraJdbcRepository {
 
     }
 
-    //rest sollte logisch sein
+    //rest sollte logisch seint
     public Veranstaltung findById(long id) {
         return jdbcTemplate.queryForObject("select * from Veranstaltung where id=?", new Object[] {
                     id
