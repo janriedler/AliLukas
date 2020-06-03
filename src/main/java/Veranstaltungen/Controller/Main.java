@@ -46,15 +46,7 @@ public class Main {
             future.remove(0);
         }
         model.addAttribute("veranstaltungen", future);
-
-
-        //liste Top3
-        List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
-        List<Veranstaltung> top= new ArrayList<>();
-        if (tmp.size() > 0) top.add(tmp.get(0));
-        if (tmp.size() > 1) top.add(tmp.get(1));
-        if (tmp.size() > 2) top.add(tmp.get(2));
-        model.addAttribute("top3", top);
+        model.addAttribute("top3", getTop3());
         return "verlist";
     }
 
@@ -99,13 +91,7 @@ public class Main {
             }
             model.addAttribute("veranstaltungen", ver);
 
-            //get Top 3 Events
-            List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
-            List<Veranstaltung> top= new ArrayList<>();
-            if (tmp.size() > 0) top.add(tmp.get(0));
-            if (tmp.size() > 1) top.add(tmp.get(1));
-            if (tmp.size() > 2) top.add(tmp.get(2));
-            model.addAttribute("top3", top);
+            model.addAttribute("top3", getTop3());
             return "verlist";
         }
         ver.addAll(repository.findType(sort));
@@ -113,15 +99,7 @@ public class Main {
             ver.remove(0);
         }
         model.addAttribute("veranstaltungen", ver);
-
-
-        //get Top 3 Events
-        List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
-        List<Veranstaltung> top= new ArrayList<>();
-        if (tmp.size() > 0) top.add(tmp.get(0));
-        if (tmp.size() > 1) top.add(tmp.get(1));
-        if (tmp.size() > 2) top.add(tmp.get(2));
-        model.addAttribute("top3", top);
+        model.addAttribute("top3", getTop3());
 
 
         return "verlist";
@@ -150,6 +128,15 @@ public class Main {
 
         model.addAttribute("veranstaltungen", su);
         return "verlist";
+    }
+
+    private List<Veranstaltung> getTop3() {
+        List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
+        List<Veranstaltung> top= new ArrayList<>();
+        if (tmp.size() > 0) top.add(tmp.get(0));
+        if (tmp.size() > 1) top.add(tmp.get(1));
+        if (tmp.size() > 2) top.add(tmp.get(2));
+        return top;
     }
 
 
