@@ -110,8 +110,9 @@ public class Main {
 
 
     /**
-     * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten eine Suche
-     * Die wird dann hier genommen, alle Einträge in DB (Name,Ort) überprüft ob diese die Suche entahlten ist und
+     * die Startseite (verlist.html) hat post request hier hin gesendet (http://localhost:8080/suche).
+     * Dieser beinhalten einen geuschten String.
+     * Dieser wird dann hier genommen, alle Einträge in DB (Name,Ort) überprüft ob diese die Suche entahlten ist und
      * dann eine entsprechende Liste erstellt
      * Dies wird dann wieder an die Startseite gesendet --> Jetzt wird dort nur noch Veranstaltungen gezeigt die die
      * Suche entahlten
@@ -141,8 +142,8 @@ public class Main {
 
 
     /**
-     * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten das ein die Vera. ID und
-     * das das ranking um eins eröht werden soll. Dies geschieht hier.
+     * die Startseite (verlist.html) hat post request hier hin gesendet (http://localhost:8080/votUp).
+     * Dieser beinhalten das ein die Vera. ID und das das ranking um eins eröht werden soll. Dies geschieht hier.
      */
     @RequestMapping("voteUp")
     public String up (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException, IOException {
