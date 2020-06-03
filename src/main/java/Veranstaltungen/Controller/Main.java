@@ -24,9 +24,9 @@ public class Main {
      * Dazu wird eine Liste mit allen Veranstaltungen in der Zukunft erstellt, auf 20 Einträge reduziert und die dann der
      * Startseite mitübergeben
      *
-     * Zudem wird auch eine Liste der top 3 Events (auch mit vergangen) erstellt und mitübergeben
+     * Zudem wird auch eine Liste der top 3 Events (auch mit vergangenen) erstellt und mitübergeben
      *
-     * Dazu wird Wetter wird hier auch geupdatet (1 Zeile)
+     * Dazu wird Wetter wird hier auch geupdated (1 Zeile)
      */
     @GetMapping()
     public String showAll(Model model) throws IOException, ParseException {
