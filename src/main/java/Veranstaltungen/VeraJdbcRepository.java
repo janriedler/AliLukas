@@ -47,7 +47,7 @@ public class VeraJdbcRepository {
 
     }
 
-    //sotiert Liste
+    //sotiert Liste nach Ranking
     public List < Veranstaltung > findAllSort() {
         List<Veranstaltung> old = new ArrayList<>(
                 jdbcTemplate.query("select * from Veranstaltung", new VeranstaltungRowMapper()));
@@ -55,7 +55,7 @@ public class VeraJdbcRepository {
         return old;
     }
 
-    //gibt alle Einträge zurück die den String type in der Spalte "art" enthalten sind
+    //gibt alle Einträge zurück die den String "type" in der Spalte "art" enthalten sind
     public List < Veranstaltung > findType(String type) {
         List<Veranstaltung> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE ART =? ", new Object[] {
                 type
@@ -83,7 +83,7 @@ public class VeraJdbcRepository {
         return jdbcTemplate.queryForObject("select * from Veranstaltung where id=?", new Object[] {
                     id
                 },
-                new BeanPropertyRowMapper < Veranstaltung > (Veranstaltung.class));
+                new BeanPropertyRowMapper <> (Veranstaltung.class));
     }
 
 
@@ -129,33 +129,33 @@ public class VeraJdbcRepository {
      */
     public void updateWetter() {
         List <Veranstaltung> vera = new ArrayList<>(findAll());
-        for (int i = 0; i < vera.size(); i++) {
-            if (vera.get(i).getWetter().equals("unbekannt")) {
-                if (JsonFormat.checkTime(vera.get(i).getDatum())) { //wenn Zeit inner nächster Woche
-                    String id = JsonFormat.getWoeid(vera.get(i).getOrt()); //mit Klasse JsonFormat wird die ID von einem Ort bestimmt
+        for (Veranstaltung veranstaltung : vera) {
+            if (veranstaltung.getWetter().equals("unbekannt")) {
+                if (JsonFormat.checkTime(veranstaltung.getDatum())) { //wenn Zeit inner nächster Woche
+                    String id = JsonFormat.getWoeid(veranstaltung.getOrt()); //mit Klasse JsonFormat wird die ID von einem Ort bestimmt
                     if (!id.equals("noloc")) { //loloc wird von JsonFormat zurückgegen wenn der Ort nicht gefunden wurde
-                        String wet = JsonFormat.getWetter(id, vera.get(i).getDatum());
-                        vera.get(i).setWetter(wet); //mit Klasse JsonFormat wird mittels ID und Datum das Wetter bestimmt
-                        System.out.println("Id: " + vera.get(i).getId() + " der String: " + wet);
-                        updateWetterValue(vera.get(i).getId(), wet);
+                        String wet = JsonFormat.getWetter(id, veranstaltung.getDatum());
+                        veranstaltung.setWetter(wet); //mit Klasse JsonFormat wird mittels ID und Datum das Wetter bestimmt
+                        System.out.println("Id: " + veranstaltung.getId() + " der String: " + wet);
+                        updateWetterValue(veranstaltung.getId(), wet);
                     } else {
-                        vera.get(i).setWetter("Ort nicht vorhanden");
-                        updateWetterValue(vera.get(i).getId(), "Ort nicht vorhanden");
+                        veranstaltung.setWetter("Ort nicht vorhanden");
+                        updateWetterValue(veranstaltung.getId(), "Ort nicht vorhanden");
                     }
                 } else {
-                    vera.get(i).setWetter("zu weit entfernt");
-                    updateWetterValue(vera.get(i).getId(), "zu weit entfernt");
+                    veranstaltung.setWetter("zu weit entfernt");
+                    updateWetterValue(veranstaltung.getId(), "zu weit entfernt");
                 }
-            } else if (vera.get(i).getWetter().equals("zu weit entfernt")) {
-                if (JsonFormat.checkTime(vera.get(i).getDatum())) { //wenn Zeit inner nächster Woche
-                    String id = JsonFormat.getWoeid(vera.get(i).getOrt()); //mit Klasse JsonFormat wird die ID von einem Ort bestimmt
+            } else if (veranstaltung.getWetter().equals("zu weit entfernt")) {
+                if (JsonFormat.checkTime(veranstaltung.getDatum())) { //wenn Zeit inner nächster Woche
+                    String id = JsonFormat.getWoeid(veranstaltung.getOrt()); //mit Klasse JsonFormat wird die ID von einem Ort bestimmt
                     if (!id.equals("noloc")) { //loloc wird von JsonFormat zurückgegen wenn der Ort nicht gefunden wurde
-                        String wet = JsonFormat.getWetter(id, vera.get(i).getDatum());
-                        vera.get(i).setWetter(wet); //mit Klasse JsonFormat wird mittels ID und Datum das Wetter bestimmt
-                        updateWetterValue(vera.get(i).getId(), wet);
+                        String wet = JsonFormat.getWetter(id, veranstaltung.getDatum());
+                        veranstaltung.setWetter(wet); //mit Klasse JsonFormat wird mittels ID und Datum das Wetter bestimmt
+                        updateWetterValue(veranstaltung.getId(), wet);
                     } else {
-                        vera.get(i).setWetter("Ort nicht vorhanden");
-                        updateWetterValue(vera.get(i).getId(), "Ort nicht vorhanden");
+                        veranstaltung.setWetter("Ort nicht vorhanden");
+                        updateWetterValue(veranstaltung.getId(), "Ort nicht vorhanden");
                     }
 
                 }

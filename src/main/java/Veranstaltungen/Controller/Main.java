@@ -29,7 +29,7 @@ public class Main {
      * Dazu wird Wetter wird hier auch geupdated (1 Zeile)
      */
     @GetMapping()
-    public String showAll(Model model) throws IOException, ParseException {
+    public String showAll(Model model) throws ParseException {
         repository.updateWetter();
 
         //Liste alle in Zukunft
@@ -83,12 +83,12 @@ public class Main {
 
 
     /**
-     * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten die gewünschte Art
+     * die Startseite (verlist.html) hat post request hier hin gesendet (http://localhost:8080/sort). Dieser beinhalten die gewünschte Art
      * nach der die Veranstaltung sotiert werden soll. Die wird dann hier genommen, eine entsprechende Liste erstellt
      * und dann wieder an die Startseite gesendet --> Jetzt wird dort nur noch Veranstaltungen von einer Art gezeigt
      */
     @RequestMapping("sort")
-    public String showAll2(Model model, @RequestParam String sort) throws IOException {
+    public String showAll2(Model model, @RequestParam String sort) {
         repository.updateWetter();
         List<Veranstaltung> ver = new ArrayList<>();
         if (sort.equals("Alle (auch Vergangenheit)")) {
@@ -118,14 +118,14 @@ public class Main {
      * Suche entahlten
      */
     @RequestMapping("suche")
-    public String showAll3(Model model, @RequestParam String entry) throws IOException {
+    public String showAll3(Model model, @RequestParam String entry) {
         repository.updateWetter();
         List<Veranstaltung> verg= new ArrayList<>(repository.findAll());
         List<Veranstaltung> su = new ArrayList<>();
-        for (int i = 0; i < verg.size(); i++) {
-            if (verg.get(i).getVer_name().toLowerCase().contains(entry.toLowerCase()) ||
-                    verg.get(i).getOrt().toLowerCase().contains(entry.toLowerCase())) {
-                su.add(verg.get(i));
+        for (Veranstaltung veranstaltung : verg) {
+            if (veranstaltung.getVer_name().toLowerCase().contains(entry.toLowerCase()) ||
+                    veranstaltung.getOrt().toLowerCase().contains(entry.toLowerCase())) {
+                su.add(veranstaltung);
             }
         }
 
@@ -146,7 +146,7 @@ public class Main {
      * Dieser beinhalten das ein die Vera. ID und das das ranking um eins eröht werden soll. Dies geschieht hier.
      */
     @RequestMapping("voteUp")
-    public String up (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException, IOException {
+    public String up (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException {
 
         long tmp = Long.parseLong(id);
         repository.voteUp(tmp, ranking);
@@ -157,7 +157,7 @@ public class Main {
      * prinzip wie oben
      */
     @RequestMapping("voteDown")
-    public String down (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException, IOException {
+    public String down (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException {
 
         long tmp = Long.parseLong(id);
         repository.voteDown(tmp, ranking);
