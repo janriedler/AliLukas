@@ -24,11 +24,15 @@ public class Main {
      * Dazu wird eine Liste mit allen Veranstaltungen in der Zukunft erstellt, auf 20 Einträge reduziert und die dann der
      * Startseite mitübergeben
      *
-     * Dazu wird Wetter.calc gestartet, wodurch das Wetter zu jedem Ort berechnet wird
+     * Zudem wird auch eine Liste der top 3 Events (auch mit vergangen) erstellt und mitübergeben
+     *
+     * Dazu wird Wetter wird hier auch geupdatet (1 Zeile)
      */
     @GetMapping()
     public String showAll(Model model) throws IOException, ParseException {
         repository.updateWetter();
+
+        //Liste alle in Zukunft
         List<Veranstaltung> ver = new ArrayList<>(repository.findAll());
         List<Veranstaltung> future = new ArrayList<>();
         for (Veranstaltung veranstaltung : ver) {
@@ -42,14 +46,12 @@ public class Main {
         model.addAttribute("veranstaltungen", future);
 
 
-
+        //liste Top3
         List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
         List<Veranstaltung> top= new ArrayList<>();
         if (tmp.size() > 0) top.add(tmp.get(0));
         if (tmp.size() > 1) top.add(tmp.get(1));
         if (tmp.size() > 2) top.add(tmp.get(2));
-
-        System.out.println(top.get(0));
         model.addAttribute("top3", top);
         return "verlist";
     }
@@ -64,9 +66,11 @@ public class Main {
         return "add";
     }
 
+
+
     /**
-     * holt die selbstgeschrieben  VeraJdbcRepository Klasse, wodurch die dortigen Methoden für Datenbanken abfragen
-     * verwendet werden können
+     * holt die selbstgeschrieben  VeraJdbcRepository Klasse, wodurch die dortigen Methoden für Datenbanken benutzt
+     * benutzt werden können (z.B. repository.methode())
      */
     @Autowired
     VeraJdbcRepository repository;
@@ -104,7 +108,7 @@ public class Main {
 
     /**
      * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten eine Suche
-     * Die wird dann hier genommen, alle Einträge in DB (Name,Ort) überprüft ob diese die Suche entahlten und
+     * Die wird dann hier genommen, alle Einträge in DB (Name,Ort) überprüft ob diese die Suche entahlten ist und
      * dann eine entsprechende Liste erstellt
      * Dies wird dann wieder an die Startseite gesendet --> Jetzt wird dort nur noch Veranstaltungen gezeigt die die
      * Suche entahlten
@@ -146,8 +150,7 @@ public class Main {
     }
 
     /**
-     * die Startseite (verlist.html) hat post request hier hin gesendet. Dieser beinhalten das ein die Vera. ID und
-     * das das ranking um eins eröht werden soll. Dies geschieht hier.
+     * prinzip wie oben
      */
     @RequestMapping("voteDown")
     public String down (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException, IOException {

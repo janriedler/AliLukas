@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 public class AddDatabase {
 
@@ -22,8 +25,8 @@ public class AddDatabase {
 
     /**
      * die add.html hat post request hier hin gesendet. Dieser beinhalten die Darten einer Vernastaltung
-     * Diese Vera. wird hier dann erstellt und dann an die DB gesendet.
-     * Anschließend wird angezeigt das alles gut ging
+     * Diese Vera. wird hier dann erstellt (falls der Name nicht schon vorhanden ist) und dann an die DB gesendet.
+     * Anschließend wird angezeigt das angezeigt gelaufen ist
      */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "addVer")
     @ResponseBody
@@ -34,6 +37,14 @@ public class AddDatabase {
         this.beschreibung = beschreibung;
         this.art = art;
         this.datum = datum;
+
+        List<Veranstaltung> validate = new ArrayList<>(repository.findName(name));
+        if (validate.size() != 0) {
+            return "<div>\n" +
+                    "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
+                    "</div>" +
+                    "Die Name ist leider schon vergeben";
+        }
         insert();
         return "<div>\n" +
                 "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +

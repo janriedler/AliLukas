@@ -1,7 +1,4 @@
-/**
- * Die Klasse startet das Projekt (schaltet sozusagen die Listener an)
- * Der "Listener" der die Startseite (http://localhost:8080) abfängt ist in Controller -> Main
- */
+
 
 package Veranstaltungen;
 
@@ -12,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 
-
+/**
+ * Die Klasse startet das Projekt (schaltet sozusagen die Listener an)
+ * Der "Listener" der die Startseite (http://localhost:8080) abfängt ist in Controller -> Main
+ */
 @SpringBootApplication
 public class Start {
     private Logger logger = LoggerFactory.getLogger(this.getClass());

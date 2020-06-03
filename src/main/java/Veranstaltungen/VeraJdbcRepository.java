@@ -17,6 +17,12 @@ public class VeraJdbcRepository {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+
+    /**
+     * selbst geschrieben Repository die die Methoden hat, die benötigt werden um mit der Datenbank zu arbeitet
+     * d.h. hier wird immer die Datenbank geupdated
+     */
+
     class VeranstaltungRowMapper implements RowMapper < Veranstaltung > {
 
         @Override
@@ -35,20 +41,21 @@ public class VeraJdbcRepository {
         }
 
     }
-
+    //gibt liste aller Einträge soriert nach ranking zurück
     public List < Veranstaltung > findAll() {
         return findAllSort();
 
     }
 
+    //sotiert Liste
     public List < Veranstaltung > findAllSort() {
-        System.out.println("So oft werde ich ausgeführt");
         List<Veranstaltung> old = new ArrayList<>(
                 jdbcTemplate.query("select * from Veranstaltung", new VeranstaltungRowMapper()));
         old.sort(Comparator.comparing(Veranstaltung::getRankingInt).reversed());
         return old;
     }
 
+    //gibt alle Einträge zurück die den String type in der Spalte "art" enthalten sind
     public List < Veranstaltung > findType(String type) {
         List<Veranstaltung> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE ART =? ", new Object[] {
                 type
@@ -59,7 +66,19 @@ public class VeraJdbcRepository {
         return old;
 
     }
+    //das selbe mit der Spalte "ver_name"
+    public List < Veranstaltung > findName(String type) {
+        List<Veranstaltung> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE VER_NAME =? ", new Object[] {
+                type
+        },
+                new VeranstaltungRowMapper());
 
+        old.sort(Comparator.comparing(Veranstaltung::getRankingInt).reversed());
+        return old;
+
+    }
+
+    //rest sollte logisch sein
     public Veranstaltung findById(long id) {
         return jdbcTemplate.queryForObject("select * from Veranstaltung where id=?", new Object[] {
                     id
@@ -73,7 +92,6 @@ public class VeraJdbcRepository {
     }
 
     public int insert(Veranstaltung vera) {
-
         return jdbcTemplate.update("insert into Veranstaltung (id, ver_name, ort, datum, beschreibung, art, rank, wetter) "
                         + "values(?,  ?, ?, ?, ?,?, ?, ?)",
 
@@ -106,6 +124,9 @@ public class VeraJdbcRepository {
 
     }
 
+    /**
+     * hierüber müssten wir noch reden
+     */
     public void updateWetter() {
         List <Veranstaltung> vera = new ArrayList<>(findAll());
         for (int i = 0; i < vera.size(); i++) {
