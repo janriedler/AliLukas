@@ -19,6 +19,8 @@ import java.util.List;
 
 @Controller
 public class Main {
+
+
     /**
      * Der Listener fängt die Startseite "http://localhost:8080" ab und leitet weiter an resources -> templates -> verlist.html (Tymeleaf)
      * d.h es wird die Startseite angezeigt
@@ -74,7 +76,6 @@ public class Main {
     }
 
 
-
     /**
      * die Startseite (verlist.html) hat post request hier hin gesendet (http://localhost:8080/sort). Dieser beinhalten die gewünschte Art
      * nach der die Veranstaltung sotiert werden soll. Die wird dann hier genommen, eine entsprechende Liste erstellt
@@ -91,7 +92,6 @@ public class Main {
                 ver.remove(0);
             }
             model.addAttribute("veranstaltungen", ver);
-
             model.addAttribute("top3", getTop3());
             return "verlist";
         }
@@ -126,10 +126,10 @@ public class Main {
                 su.add(veranstaltung);
             }
         }
-
         model.addAttribute("veranstaltungen", su);
         return "verlist";
     }
+
 
     private List<Veranstaltung> getTop3() {
         List<Veranstaltung> tmp= new ArrayList<>(repository.findAll());
@@ -154,26 +154,19 @@ public class Main {
      */
     @RequestMapping("voteUp")
     public String up (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException {
-
         long tmp = Long.parseLong(id);
         repository.voteUp(tmp, ranking);
         return showAll(model);
     }
+
 
     /**
      * prinzip wie oben
      */
     @RequestMapping("voteDown")
     public String down (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException {
-
         long tmp = Long.parseLong(id);
         repository.voteDown(tmp, ranking);
         return showAll(model);
     }
-
-
-
-
-
-
 }
