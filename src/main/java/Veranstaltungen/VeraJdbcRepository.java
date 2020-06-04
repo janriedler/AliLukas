@@ -42,13 +42,13 @@ public class VeraJdbcRepository {
 
     }
     //gibt liste aller Einträge soriert nach ranking zurück
-    public List < Veranstaltung > findAll() {
+    public List <Veranstaltung> findAll() {
         return findAllSort();
 
     }
 
     //sotiert Liste nach Ranking
-    public List < Veranstaltung > findAllSort() {
+    private List <Veranstaltung> findAllSort() {
         List<Veranstaltung> old = new ArrayList<>(
                 jdbcTemplate.query("select * from Veranstaltung", new VeranstaltungRowMapper()));
         old.sort(Comparator.comparing(Veranstaltung::getRankingInt).reversed());
@@ -56,7 +56,7 @@ public class VeraJdbcRepository {
     }
 
     //gibt alle Einträge zurück die den String "type" in der Spalte "art" enthalten sind
-    public List < Veranstaltung > findType(String type) {
+    public List <Veranstaltung> findType(String type) {
         List<Veranstaltung> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE ART =? ", new Object[] {
                 type
         },
@@ -67,7 +67,7 @@ public class VeraJdbcRepository {
 
     }
     //das selbe mit der Spalte "ver_name"
-    public List < Veranstaltung > findName(String type) {
+    public List <Veranstaltung> findName(String type) {
         List<Veranstaltung> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE VER_NAME =? ", new Object[] {
                 type
         },

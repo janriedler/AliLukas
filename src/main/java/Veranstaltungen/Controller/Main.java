@@ -101,8 +101,6 @@ public class Main {
         }
         model.addAttribute("veranstaltungen", ver);
         model.addAttribute("top3", getTop3());
-
-
         return "verlist";
     }
 
