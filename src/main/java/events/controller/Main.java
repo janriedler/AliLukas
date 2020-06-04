@@ -1,5 +1,6 @@
 package events.controller;
 
+import events.Arten;
 import events.Start;
 import events.VeraJdbcRepository;
 import events.Event;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +35,12 @@ class Main {
      * Dazu wird Wetter wird hier auch geupdated (1 Zeile)
      */
     @GetMapping()
-    public String showAll(Model model) throws ParseException {
+    public String showAll(HttpServletRequest request, Model model) throws ParseException {
+        List<Arten> arten = new ArrayList<>(Start.getArten());
+        Arten all = new Arten("Alle (auch Vergangenheit)");
+        arten.add(all);
+        model.addAttribute("arten", arten);
+
         repository.setWeatherTask();
         //Liste alle in Zukunft
         List<Event> ver = new ArrayList<>(repository.findAll());
@@ -46,6 +55,24 @@ class Main {
         while (future.size() > 20) {
             future.remove(0);
         }
+
+        Cookie[] cookies = request.getCookies();
+
+            ArrayList<Long> upVote = new ArrayList<>();
+            ArrayList<Long> downVote = new ArrayList<>();
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                if (cookie.getValue().equals("1")) {
+                    upVote.add(Long.parseLong(cookie.getName()));
+                } else {
+                    downVote.add(Long.parseLong(cookie.getName()));
+                }
+            }
+        }
+
+        model.addAttribute("upVote", upVote);
+        model.addAttribute("downVote", downVote);
         model.addAttribute("veranstaltungen", future);
         model.addAttribute("top3", getTop3());
         return "verlist";
@@ -78,17 +105,19 @@ class Main {
      */
     @RequestMapping("sort")
     public String ShowAllWithCategoryFilter(Model model, @RequestParam String sort) {
+        List<Arten> arten = new ArrayList<>(Start.getArten());
+        Arten all = new Arten("Alle (auch Vergangenheit)");
+        arten.add(all);
+        model.addAttribute("arten", arten);
         repository.setWeatherTask();
+
         List<Event> ver = new ArrayList<>();
         if (sort.equals("Alle (auch Vergangenheit)")) {
             ver.addAll(repository.findAll());
             //Damit werden nur die letzt 20 Einträge wiedergegeben
-            ver = ver.subList(0, 21);
-            model.addAttribute("veranstaltungen", ver);
-            model.addAttribute("top3", getTop3());
-            return "verlist";
+        } else {
+            ver.addAll(repository.findType(sort));
         }
-        ver.addAll(repository.findType(sort));
         while (ver.size() > 20) {
             ver.remove(0);
         }
@@ -106,7 +135,12 @@ class Main {
      * Suche entahlten
      */
     @RequestMapping("suche")
-    public String showAllWithSearch(Model model, @RequestParam String entry) {
+    public String showAllWithSearch( Model model, @RequestParam String entry) {
+        List<Arten> arten = new ArrayList<>(Start.getArten());
+        Arten all = new Arten("Alle (auch Vergangenheit)");
+        arten.add(all);
+        model.addAttribute("arten", arten);
+
         repository.setWeatherTask();
         List<Event> verg = new ArrayList<>(repository.findAll());
         List<Event> su = new ArrayList<>();
@@ -121,33 +155,41 @@ class Main {
         return "verlist";
     }
 
-    /**
-     * die Startseite (verlist.html) hat post request hier hin gesendet
-     * (http://localhost:8080/votUp). Dieser beinhalten das ein die Vera.
-     * ID und das das ranking um eins eröht werden soll. Dies geschieht hier.
-     */
-    @RequestMapping("voteUp")
-    public String up (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException {
+    @RequestMapping("vote")
+    public String vote (HttpServletRequest request, HttpServletResponse response, @RequestParam String id, @RequestParam String ranking) {
+        int value = Integer.parseInt(ranking);
+        value += votingChanged(request, id);
+
         long tmp = Long.parseLong(id);
-        repository.voteUp(tmp, ranking);
-        return showAll(model);
+        repository.vote(tmp, value);
+        response.addCookie(new Cookie(id, ranking));
+        return "voted";
     }
 
     /**
-     * die Startseite (verlist.html) hat post request hier hin gesendet
-     * (http://localhost:8080/votUp). Dieser beinhalten das ein die Vera.
-     * ID und das das ranking um eins erniedrigt werden soll.
-     * Dies geschieht hier.
+     * Fetches the old Voting and returns what needs to be undone.
      */
-    @RequestMapping("voteDown")
-    public String down (Model model, @RequestParam String id, @RequestParam String ranking) throws ParseException {
-        long tmp = Long.parseLong(id);
-        repository.voteDown(tmp, ranking);
-        return showAll(model);
+    private int votingChanged(HttpServletRequest request, String id) {
+        Cookie[] cookies = request.getCookies();
+        Cookie voted = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(id)) {
+                    voted = cookie;
+                }
+            }
+        }
+        if (voted != null) {
+            int votedValue = Integer.parseInt(voted.getValue());
+            if (Math.abs(votedValue) == 1) {
+                return -1 * votedValue;
+            }
+        }
+        return 0;
     }
 
     /**
-     * Prüft, ob das Datum in der Zukunft liegt.
+     * Checks, if the date is in the future.
      */
     private boolean checkFuture(String pDateString) throws ParseException {
         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(pDateString);

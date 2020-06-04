@@ -5,21 +5,15 @@
     <title></title>
     <link rel="stylesheet" href="style.css">
     <script language="javascript" type="text/javascript" src="script.js"></script> <!-- !!!! in static -> script.js !!!! -->
-
 </head>
+
 <body>
 <div class="sidenav">
     <a href="add">Veranstaltung hinzufügen</a><br>
     <a href="/">Startseite</a> <br><br><br><br><br><br>
     <a href="/"  style="color:white;">Top 3 Events:</a>
     <tr th:each="veranstaltung : ${top3}" class="centerMe">
-
         <span th:text="${veranstaltung.ver_name}" class="centerMe" style="color:white; font-size:23px;" > Name </span>
-
-
-
-
-
 </div>
 <div class="main">
     <table>
@@ -28,14 +22,12 @@
     <th>
         <form action="sort" method="post">
         <label>
-        <select name="sort" size="1">
-            <option>Alle (auch Vergangenheit)</option>
-            <option>Musik</option>
-            <option>Fußball</option>
-            <option>Party</option>
-            <option>Hochzeit</option>
-            <option>Essen</option>
-        </select>
+            <select name="sort">
+                <option th:each="art : ${arten}"
+                        th:value="${art.name}"
+                        th:text="${art.name}">
+                </option>
+            </select>
         </label>
             <input type="submit" value="anzeigen">
         </form></th>
@@ -57,7 +49,6 @@
         <th>Platz 3: ROT</th>
         </thead>
     </table>
-
 
     <table >
         <thead >
@@ -82,7 +73,6 @@
         einer übergeben Liste ausgeführt-->
     <tr th:each="veranstaltung : ${veranstaltungen}" >
 
-
         <!--<td><span th:text="${veranstaltung.id}"> id </span></td>-->
         <td><span th:text="${veranstaltung.ver_name}"> Name </span></td>
         <td><span th:text="${veranstaltung.ort}"> Ort </span></td>
@@ -91,14 +81,18 @@
         <td><span th:text="${veranstaltung.datum}"> datum </span></td>
         <td><span th:text="${veranstaltung.wetter}" id="wetter"> wetter </span></td>
         <td><span th:text="${veranstaltung.ranking}" id="ranking"> Ranking </span></td>
-        <td><form action="voteUp" method="post">
+        <td><form action="vote" method="post">
             <input type="hidden" th:value="${veranstaltung.id}" name="id" />
-            <input type="hidden" th:value="${veranstaltung.ranking}" name="ranking" />
-            <input type="submit" value="gut" ></form>
-        <form action="voteDown" method="post">
+            <input type="hidden" value="1" name="ranking" />
+            <p th:if="${!#lists.contains(upVote, veranstaltung.id)}">
+                <input type="submit" value="   +   " th:id="${veranstaltung.id}" class="up"></form>
+            </p>
+        <form action="vote" method="post">
             <input type="hidden" th:value="${veranstaltung.id}" name="id" />
-            <input type="hidden" th:value="${veranstaltung.ranking}" name="ranking" />
-            <input type="submit" value="schlecht" ></form>
+            <input type="hidden" value="-1"  name="ranking" />
+        <p th:if="${!#lists.contains(downVote, veranstaltung.id)}">
+            <input type="submit" value="   -   " th:id="${veranstaltung.id}" class="down"></form>
+        </p>
         </td>
     </tr>
 

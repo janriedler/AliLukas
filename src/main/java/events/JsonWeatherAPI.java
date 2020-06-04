@@ -63,27 +63,4 @@ class JsonWeatherAPI
         conn.disconnect();
         return inline;
     }
-
-    /*
-    //prüft ob Datum innerhelb der nächten Woche liegt (Kann noch verbessert werden)
-    static boolean checkTime(String datum){
-        String inline = "";
-        String[] zahl = datum.split("-");
-        datum = zahl[1] + "/" + zahl[2] + "/" + zahl[0];
-        System.out.println(datum);
-        return ZonedDateTime
-                .now()                           // Captures current moment as seen by the wall-clock time of the JVM’s current default time zone. Better to pass the optional `ZoneId` argument to specify explicitly the desired/expected time zone.
-                .minusWeeks( 1 )
-                .isBefore(
-                        LocalDateTime
-                                .parse(
-                                        datum + " 00:01 PM" ,
-                                        DateTimeFormatter.ofPattern( "MM/dd/uuuu hh:mm a" , Locale.US )
-                                )
-                                .atZone(
-                                        ZoneId.systemDefault()   // Better to pass explicitly the time zone known to have been intended for this input. See discussion below.
-                                )
-                );
-    }
-    */
 }

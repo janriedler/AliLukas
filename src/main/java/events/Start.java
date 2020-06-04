@@ -18,6 +18,7 @@ import java.util.List;
  */
 @SpringBootApplication
 public class Start {
+
     static List<Arten> arten = new ArrayList<>();
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
