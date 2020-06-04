@@ -130,6 +130,7 @@ public class VeraJdbcRepository {
     public void updateWetter() {
         List <Veranstaltung> vera = new ArrayList<>(findAll());
         for (Veranstaltung veranstaltung : vera) {
+            /**
             if (veranstaltung.getWetter().equals("unbekannt")) {
                 if (JsonFormat.checkTime(veranstaltung.getDatum())) { //wenn Zeit inner nächster Woche
                     String id = JsonFormat.getWoeid(veranstaltung.getOrt()); //mit Klasse JsonFormat wird die ID von einem Ort bestimmt
@@ -160,6 +161,9 @@ public class VeraJdbcRepository {
 
                 }
             }
+             */
+            veranstaltung.setWetter("loading");
+            updateWetterValue(veranstaltung.getId(), "loading");
         }
 
     }
