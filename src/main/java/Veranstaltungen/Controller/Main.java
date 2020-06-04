@@ -59,7 +59,8 @@ public class Main {
      * d.h es wird die add.html Seite angezeigt
      */
     @GetMapping("add")
-    public String form() {
+    public String form(Model model) {
+        model.addAttribute("arten", Start.getArten());
         return "add";
     }
 
@@ -124,6 +125,7 @@ public class Main {
                 su.add(veranstaltung);
             }
         }
+        model.addAttribute("top3", getTop3());
         model.addAttribute("veranstaltungen", su);
         return "verlist";
     }

@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -31,7 +34,7 @@ public class AddDatabase {
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "addVer")
     @ResponseBody
     public String getQuery (@RequestParam String name, @RequestParam String ort, @RequestParam String beschreibung,
-                            @RequestParam String art, @RequestParam String datum) {
+                            @RequestParam String art, @RequestParam String datum) throws ParseException {
         this.name = name;
         this.ort = ort;
         this.beschreibung = beschreibung;
@@ -44,6 +47,12 @@ public class AddDatabase {
                     "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
                     "</div>" +
                     "Die Name ist leider schon vergeben";
+        }
+        if (!checkFuture(datum)){
+            return "<div>\n" +
+                    "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
+                    "</div>" +
+                    "Das Datum muss in der Zukunft liegen";
         }
         insert();
         return "<div>\n" +
@@ -67,6 +76,12 @@ public class AddDatabase {
     private void insert() {
         Veranstaltung neu = new Veranstaltung(name, ort, datum, beschreibung, art);
         repository.insert(neu);
+    }
+
+    //prüft ob Datum in Zukunft liegt
+    private boolean checkFuture(String pDateString) throws ParseException {
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(pDateString);
+        return new Date().before(date);
     }
 
 

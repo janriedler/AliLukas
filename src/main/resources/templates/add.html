@@ -29,13 +29,15 @@
                                       type="date" data-date-format="yyyy-mm-dd" ></td</th></thead>
                         <thead><th>Beschreibung: </th><td><input type="text" name="beschreibung" required></textarea></td></th></thead>
                         <thead><th><label>Art: </th><td>
-                            <select name="art" size="1">
-                                <option>Musik</option>
-                                <option>Fußball</option>
-                                <option>Party</option>
-                                <option>Hochzeit</option>
-                                <option>Essen</option>
+                            <!--<select name="art" size="1">-->
+                            <select name="art">
+                                <option th:each="art : ${arten}"
+                                        th:value="${art.name}"
+                                        th:text="${art.name}">
+                                </option>
                             </select>
+
+
                         </label></td></th>
                         </thead>
 
