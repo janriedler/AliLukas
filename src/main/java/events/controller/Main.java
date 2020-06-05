@@ -50,7 +50,12 @@ class Main {
      */
     @GetMapping()
     public String showAll(HttpServletRequest request, Model model) {
-        List<Event> events = eventRepository.findAllSort();
+        List<Event> events = new ArrayList<>();
+        for (Event event: eventRepository.findAllSort()) {
+            if (EventRepository.checkDateIsInFuture(event.getDatum())) {
+                events.add(event);
+            }
+        }
         doPreparations(request, events, model);
         return "verlist";
     }
@@ -118,7 +123,12 @@ class Main {
 
     @RequestMapping("mobile")
     public String showMobile(HttpServletRequest request, Model model) {
-        List<Event> events = eventRepository.findAllSort();
+        List<Event> events = new ArrayList<>();
+        for (Event event: eventRepository.findAllSort()) {
+            if (EventRepository.checkDateIsInFuture(event.getDatum())) {
+                events.add(event);
+            }
+        }
         doPreparations(request, events, model);
         return "mobile";
     }
