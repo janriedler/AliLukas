@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class RestAPI {
+public class RestApi {
 
     private EventRepository repository;
 
     @Autowired
-    public RestAPI(EventRepository repository) {
+    public RestApi(EventRepository repository) {
         this.repository = repository;
     }
 
