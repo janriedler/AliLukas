@@ -2,20 +2,16 @@ package events;
 
 public class Event implements Comparable<Event> {
 
-    private Long id;
-    private String ver_name;
-    private String ort;
-    private String datum;
-    private String beschreibung;
-    private String art;
-    private String wetter = "unbekannt";
-    private String ranking = "0";
+    public Long id;
+    public String ver_name;
+    public String ort;
+    public String datum;
+    public String beschreibung;
+    public String art;
+    public String wetter = "unbekannt";
+    public String ranking = "0";
 
-    Event() {
-        super();
-    }
-
-    public Event(Long id, String ver_name, String ort, String datum, String beschreibung, String art) {
+    Event(Long id, String ver_name, String ort, String datum, String beschreibung, String art) {
         super();
         this.id = id;
         this.ver_name = ver_name;
@@ -90,13 +86,12 @@ public class Event implements Comparable<Event> {
         this.wetter = wetter;
     }
 
-    public String getRanking() {
+    String getRanking() {
         return ranking;
     }
 
     int getRankingInt() {
-        int wert = Integer.parseInt(getRanking());
-        return wert;
+        return Integer.parseInt(getRanking());
     }
 
     void setRanking(String ranking) {

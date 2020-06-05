@@ -3,7 +3,7 @@ package events.controller;
 import com.google.gson.Gson;
 import events.Event;
 import events.Start;
-import events.VeraJdbcRepository;
+import events.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Controller;
@@ -16,20 +16,25 @@ import java.util.List;
 
 @Controller
 public class RESTapi {
+
+    private EventRepository repository;
+
+    @Autowired
+    public RESTapi(EventRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping("events")
     @ResponseBody
     public String json(@RequestParam String n) {
-        List<Event> events = new ArrayList<>(repository.findAll());
-        while (events.size() > Integer.parseInt(n)) {
+        List<Event> events = new ArrayList<>(repository.findAllSort());
+        int size = Integer.parseInt(n);
+        while (events.size() > size) {
             events.remove(0);
         }
-
-        String json = new Gson().toJson(events);
-        return json;
+        return new Gson().toJson(events);
     }
 
-    @Autowired
-    VeraJdbcRepository repository;
     public static void main(String[] args) {
         SpringApplication.run(Start.class, args);
     }

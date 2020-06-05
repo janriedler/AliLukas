@@ -1,70 +1,70 @@
 package events;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 @Repository
-public class VeraJdbcRepository {
+public class EventRepository {
+
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    public EventRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        if (Start.isNewStart()) {
+            deleteAll();
+            fetchEvents();
+        }
+        setWeatherTask();
+    }
 
-    private boolean weatherTaskIsSet;
-
-    /**
-     * selbst geschrieben Repository die die Methoden hat, die benötigt werden,
-     * um mit der Datenbank zu arbeitet d.h. hier wird immer die Datenbank
-     * geupdated
-     */
     class VeranstaltungRowMapper implements RowMapper<Event> {
 
         @Override
         public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Event vera = new Event();
-            vera.setId(rs.getLong("id"));
-            vera.setArt(rs.getString("art"));
-            vera.setBeschreibung(rs.getString("beschreibung"));
-            vera.setVer_name(rs.getString("ver_name"));
-            vera.setOrt(rs.getString("ort"));
-            vera.setDatum(rs.getString("datum"));
-            vera.setRanking(rs.getString("rank"));
-            vera.setWetter(rs.getString("wetter"));
-            return vera;
+            Event event = new Event(rs.getLong("id"), rs.getString("ver_name"),
+                    rs.getString("ort"), rs.getString("datum"),
+                    rs.getString("beschreibung"), rs.getString("art"));
+            event.setRanking(rs.getString("rank"));
+            event.setWetter(rs.getString("wetter"));
+            return event;
         }
-
     }
 
-    public List <Event> findAll() {
-        return findAllSort();
-    }
-
-    private List <Event> findAllSort() {
+    public List <Event> findAllSort() {
         List<Event> old = new ArrayList<>(jdbcTemplate.query(
                 "select * from Veranstaltung", new VeranstaltungRowMapper()));
         old.sort(Comparator.comparing(Event::getRankingInt).reversed());
         return old;
     }
 
-    public List <Event> findType(String type) {
+    public List <Event> findByEventType(String eventType) {
         List<Event> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE ART =? ",
-                new Object[] { type }, new VeranstaltungRowMapper());
+                new Object[] { eventType }, new VeranstaltungRowMapper());
         old.sort(Comparator.comparing(Event::getRankingInt).reversed());
         return old;
     }
 
-    public List <Event> findName(String type) {
+    public List<Event> findByName(String name) {
         List<Event> old = jdbcTemplate.query("SELECT * FROM VERANSTALTUNG WHERE VER_NAME =? ",
-                new Object[] { type }, new VeranstaltungRowMapper());
+                new Object[] { name }, new VeranstaltungRowMapper());
         old.sort(Comparator.comparing(Event::getRankingInt).reversed());
         return old;
     }
@@ -101,31 +101,33 @@ public class VeraJdbcRepository {
                 "        WHERE ID = ?", data, id);
     }
 
-    public int deleteALL() {
+    private int deleteAll() {
         return jdbcTemplate.update( "delete from VERANSTALTUNG");
     }
 
-
-
-    public void setWeatherTask() {
-        if (!weatherTaskIsSet) {
-            Date date = new Date();
-            Timer timer = new Timer();
-
-            timer.schedule(new TimerTask() {
-                public void run() {
-                    System.out.println("UpdateWeatherTask is running at " + date);
-                    updateWeather();
-                }
-            }, date, 60 * 60 * 1000);//60*60*1000 add 1 hour delay between jobs.
-            weatherTaskIsSet = true;
+    private void fetchEvents() {
+        List<Event> events = Start.getEvents();
+        for (Event event: events) {
+            insert(event);
         }
     }
 
+    private void setWeatherTask() {
+        Date date = new Date();
+        Timer timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            public void run() {
+                System.out.println("UpdateWeatherTask is running at " + date);
+                updateWeather();
+            }
+        }, date, 60 * 60 * 1000);
+    }
+
     private void updateWeather() {
-        List <Event> vera = new ArrayList<>(findAll());
-        for (Event Event : vera) {
-            if (checkTime(Event.getDatum())) {
+        List <Event> events = findAllSort();
+        for (Event Event : events) {
+            if (datumIsInOneWeek(Event.getDatum())) {
                 String id = JsonWeatherAPI.getWoeid(Event.getOrt());
                 if (id != null) {
                     String weather = JsonWeatherAPI.getWeather(id, Event.getDatum());
@@ -148,9 +150,9 @@ public class VeraJdbcRepository {
         }
     }
 
-    private boolean checkTime(String datum) {
+    private boolean datumIsInOneWeek(String datum) {
         Date currentDate = new Date();
-        DateFormat format = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH);
+        DateFormat format = new SimpleDateFormat("yyyy-dd-MM", Locale.ENGLISH);
         Date datumDate;
         try {
             datumDate = format.parse(datum);
@@ -159,5 +161,15 @@ public class VeraJdbcRepository {
         }
         long difference = datumDate.getTime() - currentDate.getTime();
         return (difference <= 1000 * 60 * 60 * 24 * 7);
+    }
+
+    public static boolean checkDateIsInFuture(String datum) {
+        Date date;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(datum);
+            return new Date().before(date);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("datum is illegal!");
+        }
     }
 }

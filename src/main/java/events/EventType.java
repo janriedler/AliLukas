@@ -1,8 +1,10 @@
 package events;
 
-public class Arten {
+public class EventType {
+
     private String name;
-    public Arten(String name) {
+
+    public EventType(String name) {
         this.name = name;
     }
 

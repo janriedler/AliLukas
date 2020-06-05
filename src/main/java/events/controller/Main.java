@@ -1,10 +1,11 @@
 package events.controller;
 
-import events.Arten;
-import events.Start;
-import events.VeraJdbcRepository;
 import events.Event;
-import org.apache.coyote.Request;
+import events.EventRepository;
+import events.EventType;
+import events.EventTypeRepository;
+import events.Start;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Controller;
@@ -16,14 +17,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
 
 @Controller
 class Main {
+
+    private EventRepository eventRepository;
+    private EventTypeRepository eventTypeRepository;
+
+    @Autowired
+    public Main(EventRepository eventRepository, EventTypeRepository eventTypeRepository) {
+        this.eventRepository = eventRepository;
+        this.eventTypeRepository = eventTypeRepository;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(Start.class, args);
+    }
 
     /**
      * Der Listener fängt die Startseite "http://localhost:8080" ab und leitet weiter an resources -> templates -> verlist.html (Tymeleaf)
@@ -36,46 +49,9 @@ class Main {
      * Dazu wird Wetter wird hier auch geupdated (1 Zeile)
      */
     @GetMapping()
-    public String showAll(HttpServletRequest request, Model model) throws ParseException {
-        List<Arten> arten = new ArrayList<>(Start.getArten());
-        Arten all = new Arten("Alle (auch Vergangenheit)");
-        arten.add(all);
-        model.addAttribute("arten", arten);
-
-        repository.setWeatherTask();
-        //Liste alle in Zukunft
-        List<Event> ver = new ArrayList<>(repository.findAll());
-        List<Event> future = new ArrayList<>();
-        for (Event Event : ver) {
-            if (checkFuture(Event.getDatum())) {
-                future.add(Event);
-            }
-        }
-
-        //Damit werden nur die letzt 20 Einträge wiedergegeben
-        while (future.size() > 20) {
-            future.remove(0);
-        }
-
-        Cookie[] cookies = request.getCookies();
-
-            ArrayList<Long> upVote = new ArrayList<>();
-            ArrayList<Long> downVote = new ArrayList<>();
-        if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
-                if (cookie.getValue().equals("1")) {
-                    upVote.add(Long.parseLong(cookie.getName()));
-                } else {
-                    downVote.add(Long.parseLong(cookie.getName()));
-                }
-            }
-        }
-
-        model.addAttribute("upVote", upVote);
-        model.addAttribute("downVote", downVote);
-        model.addAttribute("veranstaltungen", future);
-        model.addAttribute("top3", getTop3());
+    public String showAll(HttpServletRequest request, Model model) {
+        List<Event> events = eventRepository.findAllSort();
+        doPreparations(request, events, model);
         return "verlist";
     }
 
@@ -84,19 +60,9 @@ class Main {
      * d.h es wird die add.html Seite angezeigt
      */
     @GetMapping("add")
-    public String form(Model model) {
-        model.addAttribute("arten", Start.getArten());
+    public String addEvent(Model model) {
+        model.addAttribute("arten", eventRepository.findAllSort());
         return "add";
-    }
-
-    /**
-     * holt die selbstgeschrieben  VeraJdbcRepository Klasse, wodurch die dortigen Methoden für Datenbanken benutzt
-     * benutzt werden können (z.B. repository.methode())
-     */
-    @Autowired
-    VeraJdbcRepository repository;
-    public static void main(String[] args) {
-        SpringApplication.run(Start.class, args);
     }
 
     /**
@@ -105,43 +71,14 @@ class Main {
      * und dann wieder an die Startseite gesendet --> Jetzt wird dort nur noch Veranstaltungen von einer Art gezeigt
      */
     @RequestMapping("sort")
-    public String ShowAllWithCategoryFilter(HttpServletRequest request,Model model, @RequestParam String sort) {
-        List<Arten> arten = new ArrayList<>(Start.getArten());
-        Arten all = new Arten("Alle (auch Vergangenheit)");
-        arten.add(all);
-        model.addAttribute("arten", arten);
-        repository.setWeatherTask();
-
-        List<Event> ver = new ArrayList<>();
+    public String ShowAllWithEventType(HttpServletRequest request, Model model, @RequestParam String sort) {
+        List<Event> events;
         if (sort.equals("Alle (auch Vergangenheit)")) {
-            ver.addAll(repository.findAll());
-            //Damit werden nur die letzt 20 Einträge wiedergegeben
+            events = eventRepository.findAllSort();
         } else {
-            ver.addAll(repository.findType(sort));
+            events = eventRepository.findByEventType(sort);
         }
-        while (ver.size() > 20) {
-            ver.remove(0);
-        }
-
-        Cookie[] cookies = request.getCookies();
-
-        ArrayList<Long> upVote = new ArrayList<>();
-        ArrayList<Long> downVote = new ArrayList<>();
-        if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
-                if (cookie.getValue().equals("1")) {
-                    upVote.add(Long.parseLong(cookie.getName()));
-                } else {
-                    downVote.add(Long.parseLong(cookie.getName()));
-                }
-            }
-        }
-
-        model.addAttribute("upVote", upVote);
-        model.addAttribute("downVote", downVote);
-        model.addAttribute("veranstaltungen", ver);
-        model.addAttribute("top3", getTop3());
+        doPreparations(request, events, model);
         return "verlist";
     }
 
@@ -155,112 +92,61 @@ class Main {
      */
     @RequestMapping("suche")
     public String showAllWithSearch(HttpServletRequest request, Model model, @RequestParam String entry) {
-        List<Arten> arten = new ArrayList<>(Start.getArten());
-        Arten all = new Arten("Alle (auch Vergangenheit)");
-        arten.add(all);
-        model.addAttribute("arten", arten);
-
-        repository.setWeatherTask();
-        List<Event> verg = new ArrayList<>(repository.findAll());
-        List<Event> su = new ArrayList<>();
-        for (Event Event : verg) {
+        List<Event> searchedEvents = new ArrayList<>();
+        for (Event Event : eventRepository.findAllSort()) {
             if (Event.getVer_name().toLowerCase().contains(entry.toLowerCase()) ||
                     Event.getOrt().toLowerCase().contains(entry.toLowerCase())) {
-                su.add(Event);
+                searchedEvents.add(Event);
             }
         }
-        Cookie[] cookies = request.getCookies();
-
-        ArrayList<Long> upVote = new ArrayList<>();
-        ArrayList<Long> downVote = new ArrayList<>();
-        if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
-                if (cookie.getValue().equals("1")) {
-                    upVote.add(Long.parseLong(cookie.getName()));
-                } else {
-                    downVote.add(Long.parseLong(cookie.getName()));
-                }
-            }
-        }
-
-        model.addAttribute("upVote", upVote);
-        model.addAttribute("downVote", downVote);
-        model.addAttribute("top3", getTop3());
-        model.addAttribute("veranstaltungen", su);
+        doPreparations(request, searchedEvents, model);
         return "verlist";
     }
 
     @RequestMapping("vote")
     public String vote (HttpServletRequest request, HttpServletResponse response, @RequestParam String id, @RequestParam String ranking) {
         int value = Integer.parseInt(ranking);
-        value += votingChanged(request, id);
+        if (Math.abs(value) == 1) {
+            value += votingChanged(request, id);
 
-        long tmp = Long.parseLong(id);
-        repository.vote(tmp, value);
-        response.addCookie(new Cookie(id, ranking));
+            long tmp = Long.parseLong(id);
+            eventRepository.vote(tmp, value);
+            response.addCookie(new Cookie(id, ranking));
+        }
         return "voted";
     }
 
     @RequestMapping("mobile")
-    public String getMobile(HttpServletRequest request, Model model) throws ParseException {
-        List<Arten> arten = new ArrayList<>(Start.getArten());
-        Arten all = new Arten("Alle (auch Vergangenheit)");
-        arten.add(all);
-        model.addAttribute("arten", arten);
-
-        repository.setWeatherTask();
-        //Liste alle in Zukunft
-        List<Event> ver = new ArrayList<>(repository.findAll());
-        List<Event> future = new ArrayList<>();
-        for (Event Event : ver) {
-            if (checkFuture(Event.getDatum())) {
-                future.add(Event);
-            }
-        }
-
-        //Damit werden nur die letzt 20 Einträge wiedergegeben
-        while (future.size() > 20) {
-            future.remove(0);
-        }
-
-        Cookie[] cookies = request.getCookies();
-
-        ArrayList<Long> upVote = new ArrayList<>();
-        ArrayList<Long> downVote = new ArrayList<>();
-        if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
-                if (cookie.getValue().equals("1")) {
-                    upVote.add(Long.parseLong(cookie.getName()));
-                } else {
-                    downVote.add(Long.parseLong(cookie.getName()));
-                }
-            }
-        }
-
-        model.addAttribute("upVote", upVote);
-        model.addAttribute("downVote", downVote);
-        model.addAttribute("veranstaltungen", future);
-        model.addAttribute("top3", getTop3());
+    public String showMobile(HttpServletRequest request, Model model) {
+        List<Event> events = eventRepository.findAllSort();
+        doPreparations(request, events, model);
         return "mobile";
     }
 
 
     @RequestMapping("event")
     public String showEvent(HttpServletRequest request, Model model, @RequestParam String id) {
-        List<Arten> arten = new ArrayList<>(Start.getArten());
-        Arten all = new Arten("Alle (auch Vergangenheit)");
-        arten.add(all);
-        model.addAttribute("arten", arten);
+        List<Event> events = new ArrayList<>();
+        events.add(eventRepository.findById(Integer.parseInt(id)));
+        doPreparations(request, events, model);
+        return "event";
+    }
 
-        repository.setWeatherTask();
-        List<Event> su = new ArrayList<>();
-        su.add(repository.findById(Integer.parseInt(id)));
-        Cookie[] cookies = request.getCookies();
-
+    private void doPreparations(HttpServletRequest request, List<Event> events, Model model) {
+        last20(events);
+        setEventTypes(model);
         ArrayList<Long> upVote = new ArrayList<>();
         ArrayList<Long> downVote = new ArrayList<>();
+        setUpDownVoteLists(request, upVote, downVote);
+
+        model.addAttribute("upVote", upVote);
+        model.addAttribute("downVote", downVote);
+        model.addAttribute("top3", getTop3());
+        model.addAttribute("veranstaltungen", events);
+    }
+
+    private void setUpDownVoteLists(HttpServletRequest request, ArrayList<Long> upVote, ArrayList<Long> downVote) {
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
                 Cookie cookie = cookies[i];
@@ -271,15 +157,13 @@ class Main {
                 }
             }
         }
-
-        model.addAttribute("upVote", upVote);
-        model.addAttribute("downVote", downVote);
-        model.addAttribute("top3", getTop3());
-        model.addAttribute("veranstaltungen", su);
-        return "event";
     }
 
-
+    private void setEventTypes(Model model) {
+        List<EventType> eventTypes = eventTypeRepository.findAll();
+        eventTypes.add(0, new EventType("Alle (auch Vergangenheit)"));
+        model.addAttribute("arten", eventTypes);
+    }
 
     /**
      * Fetches the old Voting and returns what needs to be undone.
@@ -303,19 +187,16 @@ class Main {
         return 0;
     }
 
-    /**
-     * Checks, if the date is in the future.
-     */
-    private boolean checkFuture(String pDateString) throws ParseException {
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(pDateString);
-        return new Date().before(date);
+    private List<Event> getTop3() {
+        if (eventRepository.findAllSort().size() <= 3) {
+            return eventRepository.findAllSort();
+        }
+        return eventRepository.findAllSort().subList(0, 3);
     }
 
-    /**
-     * Find the top 3 upvoted events.
-     */
-    private List<Event> getTop3() {
-        if (repository.findAll().size() < 3) return repository.findAll();
-        return new ArrayList<>(repository.findAll()).subList(0, 3);
+    private void last20(List<Event> events) {
+        while (events.size() > 20) {
+            events.remove(0);
+        }
     }
 }
