@@ -51,22 +51,21 @@ class AddDatabase {
         this. datum = datum;
         List<Event> validate = new ArrayList<>(repository.findByName(name));
         if (validate.size() != 0) {
-            return "<div>\n" +
-                    "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
-                    "</div>" +
+            return  "\"<script LANGUAGE='JavaScript'>\n" +
+                    "    window.alert('Name schon vorhanden');\n" +
+                    "    window.location.href='/add';\n" +
+                    "    </script>\"" +
                     "Die Name ist leider schon vergeben";
-        }
-        if (!EventRepository.checkDateIsInFuture(datum)){
-                return "<div>\n" +
-                        "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
-                        "</div>" +
-                        "Das Datum muss in der Zukunft liegen";
         }
         Event neu = new Event(name, ort, datum, beschreibung, art);
         repository.insert(neu);
-        return "<div>\n" +
+        return "<script>\n" +
+                " window.setTimeout(\"location.href='/';\", 0);\n" +
+                "</script>" +
+                "<div>\n" +
                 "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
                 "</div>" +
                 "Die Veranstaltung wurde erfolgreich hinzugefügt";
+
     }
 }
