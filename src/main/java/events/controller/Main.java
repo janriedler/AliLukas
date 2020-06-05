@@ -61,7 +61,7 @@ class Main {
      */
     @GetMapping("add")
     public String addEvent(Model model) {
-        model.addAttribute("arten", eventRepository.findAllSort());
+        model.addAttribute("arten", eventTypeRepository.findAll());
         return "add";
     }
 
