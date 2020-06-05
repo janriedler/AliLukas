@@ -4,6 +4,7 @@ function checkDate() {
    var now = new Date();
    if (selectedDate < now) {
     alert("Zeit muss in der Zukuft liegen");
+     document.getElementById('datepicker').value= " " ;
    }
  }
 
@@ -36,3 +37,4 @@ else{
 return true;
 }
 }
+

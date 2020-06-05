@@ -4,6 +4,7 @@ import events.Arten;
 import events.Start;
 import events.VeraJdbcRepository;
 import events.Event;
+import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Controller;
@@ -104,7 +105,7 @@ class Main {
      * und dann wieder an die Startseite gesendet --> Jetzt wird dort nur noch Veranstaltungen von einer Art gezeigt
      */
     @RequestMapping("sort")
-    public String ShowAllWithCategoryFilter(Model model, @RequestParam String sort) {
+    public String ShowAllWithCategoryFilter(HttpServletRequest request,Model model, @RequestParam String sort) {
         List<Arten> arten = new ArrayList<>(Start.getArten());
         Arten all = new Arten("Alle (auch Vergangenheit)");
         arten.add(all);
@@ -121,6 +122,24 @@ class Main {
         while (ver.size() > 20) {
             ver.remove(0);
         }
+
+        Cookie[] cookies = request.getCookies();
+
+        ArrayList<Long> upVote = new ArrayList<>();
+        ArrayList<Long> downVote = new ArrayList<>();
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                if (cookie.getValue().equals("1")) {
+                    upVote.add(Long.parseLong(cookie.getName()));
+                } else {
+                    downVote.add(Long.parseLong(cookie.getName()));
+                }
+            }
+        }
+
+        model.addAttribute("upVote", upVote);
+        model.addAttribute("downVote", downVote);
         model.addAttribute("veranstaltungen", ver);
         model.addAttribute("top3", getTop3());
         return "verlist";
@@ -135,7 +154,7 @@ class Main {
      * Suche entahlten
      */
     @RequestMapping("suche")
-    public String showAllWithSearch( Model model, @RequestParam String entry) {
+    public String showAllWithSearch(HttpServletRequest request, Model model, @RequestParam String entry) {
         List<Arten> arten = new ArrayList<>(Start.getArten());
         Arten all = new Arten("Alle (auch Vergangenheit)");
         arten.add(all);
@@ -150,6 +169,23 @@ class Main {
                 su.add(Event);
             }
         }
+        Cookie[] cookies = request.getCookies();
+
+        ArrayList<Long> upVote = new ArrayList<>();
+        ArrayList<Long> downVote = new ArrayList<>();
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                if (cookie.getValue().equals("1")) {
+                    upVote.add(Long.parseLong(cookie.getName()));
+                } else {
+                    downVote.add(Long.parseLong(cookie.getName()));
+                }
+            }
+        }
+
+        model.addAttribute("upVote", upVote);
+        model.addAttribute("downVote", downVote);
         model.addAttribute("top3", getTop3());
         model.addAttribute("veranstaltungen", su);
         return "verlist";
@@ -165,6 +201,85 @@ class Main {
         response.addCookie(new Cookie(id, ranking));
         return "voted";
     }
+
+    @RequestMapping("mobile")
+    public String getMobile(HttpServletRequest request, Model model) throws ParseException {
+        List<Arten> arten = new ArrayList<>(Start.getArten());
+        Arten all = new Arten("Alle (auch Vergangenheit)");
+        arten.add(all);
+        model.addAttribute("arten", arten);
+
+        repository.setWeatherTask();
+        //Liste alle in Zukunft
+        List<Event> ver = new ArrayList<>(repository.findAll());
+        List<Event> future = new ArrayList<>();
+        for (Event Event : ver) {
+            if (checkFuture(Event.getDatum())) {
+                future.add(Event);
+            }
+        }
+
+        //Damit werden nur die letzt 20 Einträge wiedergegeben
+        while (future.size() > 20) {
+            future.remove(0);
+        }
+
+        Cookie[] cookies = request.getCookies();
+
+        ArrayList<Long> upVote = new ArrayList<>();
+        ArrayList<Long> downVote = new ArrayList<>();
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                if (cookie.getValue().equals("1")) {
+                    upVote.add(Long.parseLong(cookie.getName()));
+                } else {
+                    downVote.add(Long.parseLong(cookie.getName()));
+                }
+            }
+        }
+
+        model.addAttribute("upVote", upVote);
+        model.addAttribute("downVote", downVote);
+        model.addAttribute("veranstaltungen", future);
+        model.addAttribute("top3", getTop3());
+        return "mobile";
+    }
+
+
+    @RequestMapping("event")
+    public String showEvent(HttpServletRequest request, Model model, @RequestParam String id) {
+        List<Arten> arten = new ArrayList<>(Start.getArten());
+        Arten all = new Arten("Alle (auch Vergangenheit)");
+        arten.add(all);
+        model.addAttribute("arten", arten);
+
+        repository.setWeatherTask();
+        List<Event> su = new ArrayList<>();
+        su.add(repository.findById(Integer.parseInt(id)));
+        Cookie[] cookies = request.getCookies();
+
+        ArrayList<Long> upVote = new ArrayList<>();
+        ArrayList<Long> downVote = new ArrayList<>();
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                if (cookie.getValue().equals("1")) {
+                    upVote.add(Long.parseLong(cookie.getName()));
+                } else {
+                    downVote.add(Long.parseLong(cookie.getName()));
+                }
+            }
+        }
+
+        model.addAttribute("upVote", upVote);
+        model.addAttribute("downVote", downVote);
+        model.addAttribute("top3", getTop3());
+        model.addAttribute("veranstaltungen", su);
+        return "event";
+    }
+
+
 
     /**
      * Fetches the old Voting and returns what needs to be undone.
@@ -200,6 +315,7 @@ class Main {
      * Find the top 3 upvoted events.
      */
     private List<Event> getTop3() {
+        if (repository.findAll().size() < 3) return repository.findAll();
         return new ArrayList<>(repository.findAll()).subList(0, 3);
     }
 }

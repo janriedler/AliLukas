@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="style.css">
-    <script language="javascript" type="text/javascript" src="script.js"></script> <!-- !!!! in static -> script.js !!!! -->
+    <script language="javascript" type="text/javascript" src="script.js"></script>
+    <script type="text/javascript">
+    if (screen.width <= 699) {
+    document.location = "mobile";
+    }
+    </script>
 </head>
 
 <body>
@@ -55,13 +60,13 @@
         <tr>
             <!--<th scope="col" class="tableKopf">ID</th>-->
             <th scope="col" class="tableKopf">Name</th>
-            <th scope="col" class="tableKopf">Ort</th>
+            <!--<th scope="col" class="tableKopf">Ort</th>
             <th scope="col" class="tableKopf">Beschreibung</th>
-            <th scope="col" class="tableKopf">Art</th>
-            <th scope="col" class="tableKopf">Datum</th>
-            <th scope="col" id="wetter" class="tableKopf">Wetter</th>
-            <th scope="col" id="ranking" class="tableKopf">Ranking</th>
-            <th scope="col" class="tableKopf">Bewerten Sie</th>
+            <th scope="col" class="tableKopf">Art</th>-->
+            <th scope="col" class="tableKopf">Beschreibung</th>
+            <th scope="col" id="wetter" class="tableKopf">Datum</th>
+            <th scope="col" id="ranking" class="tableKopf">Bewerten Sie</th>
+            <th scope="col" class="tableKopf">Info</th>
         </tr>
         </thead>
     <tbody class="category_table">
@@ -75,32 +80,37 @@
 
         <!--<td><span th:text="${veranstaltung.id}"> id </span></td>-->
         <td><span th:text="${veranstaltung.ver_name}"> Name </span></td>
-        <td><span th:text="${veranstaltung.ort}"> Ort </span></td>
+        <!--<td><span th:text="${veranstaltung.ort}"> Ort </span></td>-->
         <td><span th:text="${veranstaltung.beschreibung}"> Beschreibung </span></td>
-        <td><span th:text="${veranstaltung.art}"> art </span></td>
+        <!--<td><span th:text="${veranstaltung.art}"> art </span></td>-->
         <td><span th:text="${veranstaltung.datum}"> datum </span></td>
-        <td><span th:text="${veranstaltung.wetter}" id="wetter"> wetter </span></td>
-        <td><span th:text="${veranstaltung.ranking}" id="ranking"> Ranking </span></td>
+        <!--<td><span th:text="${veranstaltung.wetter}" id="wetter"> wetter </span></td>
+        <td><span th:text="${veranstaltung.ranking}" id="ranking"> Ranking </span></td>-->
         <td><form action="vote" method="post">
             <input type="hidden" th:value="${veranstaltung.id}" name="id" />
             <input type="hidden" value="1" name="ranking" />
             <p th:if="${!#lists.contains(upVote, veranstaltung.id)}">
-                <input type="submit" value="   +   " th:id="${veranstaltung.id}" class="up"></form>
+                <input type="submit" value="       gut       " th:id="${veranstaltung.id}" class="up"></form>
             </p>
         <form action="vote" method="post">
             <input type="hidden" th:value="${veranstaltung.id}" name="id" />
             <input type="hidden" value="-1"  name="ranking" />
         <p th:if="${!#lists.contains(downVote, veranstaltung.id)}">
-            <input type="submit" value="   -   " th:id="${veranstaltung.id}" class="down"></form>
+            <input type="submit" value="   schlecht   " th:id="${veranstaltung.id}" class="down"></form>
         </p>
         </td>
+        <td><form action="event"><input type="hidden" th:value="${veranstaltung.id}" name="id">
+            <input type=submit value="Mehr anzeigen" style="width:100%"></form></td>
     </tr>
 
         <br><br><br>
 
     </tbody>
     </table>
-
+    <footer>
+        <p>Universität Passau © Jan, Ali, Lukas. All rights reserved (Desktop)</p>
+    </footer>
 </div>
+
 </body>
 </html>

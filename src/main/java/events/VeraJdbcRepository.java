@@ -101,6 +101,12 @@ public class VeraJdbcRepository {
                 "        WHERE ID = ?", data, id);
     }
 
+    public int deleteALL() {
+        return jdbcTemplate.update( "delete from VERANSTALTUNG");
+    }
+
+
+
     public void setWeatherTask() {
         if (!weatherTaskIsSet) {
             Date date = new Date();
