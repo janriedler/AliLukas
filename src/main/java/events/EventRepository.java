@@ -8,17 +8,14 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 @Repository
 public class EventRepository {
@@ -74,16 +71,16 @@ public class EventRepository {
                 new Object[] { id }, new VeranstaltungRowMapper());
     }
 
-    public int deleteById(long id) {
-        return jdbcTemplate.update("delete from Veranstaltung where id=?", id);
-    }
-
     public int insert(Event vera) {
         return jdbcTemplate.update("insert into Veranstaltung " +
                         "(id, ver_name, ort, datum, beschreibung, art, rank, wetter) "
                         + "values(?,  ?, ?, ?, ?,?, ?, ?)",
                 vera.getId(), vera.getVer_name(), vera.getOrt(), vera.getDatum(), vera.getBeschreibung(),
                 vera.getArt(), vera.getRanking(), vera.getWetter());
+    }
+
+    private int deleteAll() {
+        return jdbcTemplate.update( "delete from VERANSTALTUNG");
     }
 
     public int vote(long id, int vote) {
@@ -99,10 +96,6 @@ public class EventRepository {
         return jdbcTemplate.update("UPDATE Veranstaltung\n" +
                 "        SET WETTER = ?\n" +
                 "        WHERE ID = ?", data, id);
-    }
-
-    private int deleteAll() {
-        return jdbcTemplate.update( "delete from VERANSTALTUNG");
     }
 
     private void fetchEvents() {
@@ -133,7 +126,6 @@ public class EventRepository {
                     String weather = JsonWeatherAPI.getWeather(id, Event.getDatum());
                     if (weather != null) {
                         Event.setWetter(weather);
-                        System.out.println("Id: " + Event.getId() + " der String: " + weather);
                         updateWetterValue(Event.getId(), weather);
                     } else {
                         Event.setWetter("Ort nicht vorhanden");
@@ -151,25 +143,23 @@ public class EventRepository {
     }
 
     private boolean datumIsInOneWeek(String datum) {
-        Date currentDate = new Date();
-        DateFormat format = new SimpleDateFormat("yyyy-dd-MM", Locale.ENGLISH);
-        Date datumDate;
+        Date dateInOneWeek = new Date(new Date().getTime()
+                + 1000 * 60 * 60 * 24 * 7);
         try {
-            datumDate = format.parse(datum);
+            Date date = new SimpleDateFormat("yyyy-dd-MM").parse(datum);
+            return (Math.abs(dateInOneWeek.getTime() - date.getTime()) > 0);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Datum string is illegal!");
+            throw new IllegalArgumentException("Datum is illegal!");
         }
-        long difference = datumDate.getTime() - currentDate.getTime();
-        return (difference <= 1000 * 60 * 60 * 24 * 7);
     }
 
     public static boolean checkDateIsInFuture(String datum) {
         Date date;
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd").parse(datum);
+            date = new SimpleDateFormat("yyyy-dd-MM").parse(datum);
             return new Date().before(date);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("datum is illegal!");
+            throw new IllegalArgumentException("Datum is illegal!");
         }
     }
 }

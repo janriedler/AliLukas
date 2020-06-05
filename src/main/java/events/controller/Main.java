@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -109,6 +110,7 @@ class Main {
     }
 
     @RequestMapping("vote")
+    @ResponseBody
     public String vote (HttpServletRequest request, HttpServletResponse response, @RequestParam String id, @RequestParam String ranking) {
         int value = Integer.parseInt(ranking);
         if (Math.abs(value) == 1) {
@@ -118,7 +120,11 @@ class Main {
             eventRepository.vote(tmp, value);
             response.addCookie(new Cookie(id, ranking));
         }
-        return "voted";
+        return  "\"<script LANGUAGE='JavaScript'>\n" +
+                "    window.alert('Vielen Dank für deinen Vote');\n" +
+                "    window.location.href='/';\n" +
+                "    </script>\"" +
+                "Vielen Dank für deinen Vote";
     }
 
     @RequestMapping("mobile")
@@ -158,8 +164,7 @@ class Main {
     private void setUpDownVoteLists(HttpServletRequest request, ArrayList<Long> upVote, ArrayList<Long> downVote) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie: cookies) {
                 if (cookie.getValue().equals("1")) {
                     upVote.add(Long.parseLong(cookie.getName()));
                 } else {
@@ -176,7 +181,8 @@ class Main {
     }
 
     /**
-     * Fetches the old Voting and returns what needs to be undone.
+     * Fetches the old Voting and returns the voting value that needs to
+     * be undone.
      */
     private int votingChanged(HttpServletRequest request, String id) {
         Cookie[] cookies = request.getCookies();

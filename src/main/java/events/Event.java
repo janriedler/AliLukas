@@ -30,78 +30,72 @@ public class Event implements Comparable<Event> {
         this.beschreibung = beschreibung;
     }
 
-    public String getVer_name() {
-        return ver_name;
-    }
-
-    public String getOrt() {
-        return ort;
-    }
-
-    public String getDatum() {
-        return datum;
-    }
-
-    public String getBeschreibung() {
-        return beschreibung;
-    }
-
-    public String getArt() {
-        return art;
-    }
-
     public Long getId() {
         return id;
-    }
-
-    void setVer_name(String ver_name) {
-        this.ver_name = ver_name;
-    }
-
-    public void setOrt(String ort) {
-        this.ort = ort;
-    }
-
-    public void setBeschreibung(String beschreibung) {
-        this.beschreibung = beschreibung;
-    }
-
-    public void setArt(String art) {
-        this.art = art;
-    }
-
-    public void setDatum(String datum) {
-        this.datum = datum;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public String getVer_name() {
+        return ver_name;
+    }
+
+    public void setVer_name(String ver_name) {
+        this.ver_name = ver_name;
+    }
+
+    public String getOrt() {
+        return ort;
+    }
+
+    public void setOrt(String ort) {
+        this.ort = ort;
+    }
+
+    public String getDatum() {
+        return datum;
+    }
+
+    public void setDatum(String datum) {
+        this.datum = datum;
+    }
+
+    public String getBeschreibung() {
+        return beschreibung;
+    }
+
+    public void setBeschreibung(String beschreibung) {
+        this.beschreibung = beschreibung;
+    }
+
+    public String getArt() {
+        return art;
+    }
+
+    public void setArt(String art) {
+        this.art = art;
+    }
+
     public String getWetter() {
         return wetter;
     }
 
-    void setWetter(String wetter) {
+    public void setWetter(String wetter) {
         this.wetter = wetter;
     }
 
-    String getRanking() {
+    public String getRanking() {
         return ranking;
-    }
-
-    int getRankingInt() {
-        return Integer.parseInt(getRanking());
     }
 
     void setRanking(String ranking) {
         this.ranking = ranking;
     }
 
-    //wie bis jetzt nicht benötigt
-    @Override
-    public String toString() {
-        return String.format("Student [id=%s, name=%s, passportNumber=%s]", id, ver_name, ort, datum, beschreibung, art);
+    public int getRankingInt() {
+        return Integer.parseInt(getRanking());
     }
 
     @Override

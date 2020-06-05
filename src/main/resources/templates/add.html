@@ -10,51 +10,59 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type="text/javascript">
-       $(function() {
-               $("#datepicker").datepicker({ dateFormat: "yy-dd-mm" }).val()
-       });
-   </script>
-
-
+        $(function() {
+            $("#datepicker").datepicker({ dateFormat: "yy-dd-mm" }).val()
+        });
+    </script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
     <link rel="stylesheet" href="style.css">
-
-
 </head>
 <body>
 <div class="sidenav">
     <a href="/">Startseite</a>
 </div>
 <div class="main">
-<div class="container my-5">
-    <h3> Veranstaltung hinzufügen</h3>
-
-                <form action="addVer" method="post"  name="form1">
-                    <table>
-                        <thead><th>Name: </th><td><input type="text" name="name" required></td></th></thead>
-
-                        <thead><th>Ort: </th><td><input type="text" name="ort" required></td></thead>
-                        <thead><th>Datum: </th><td><input onchange="checkDate()" name="datum" type="text" id="datepicker" required></td</th></thead>
-                        <thead><th>Beschreibung: </th><td><input type="text" name="beschreibung" required></textarea></td></th></thead>
-                        <thead><th><label>Art: </th><td>
-                            <!--<select name="art" size="1">-->
-                            <select name="art">
-                                <option th:each="art : ${arten}"
-                                        th:value="${art.name}"
-                                        th:text="${art.name}">
-                                </option>
-                            </select>
-
-
-                        </label></td></th>
-                        </thead>
-
-                    </table>
-                    <input type="submit" value="Veranstaltung hinzufügen">
-                </form>
-
-</div>
+    <div class="container my-5">
+        <h3> Veranstaltung hinzufügen</h3>
+        <form action="addVer" method="post"  name="form1">
+            <table>
+                <thead>
+                <th>Name: </th>
+                <td><input type="text" name="name" required></td>
+                </th>
+                </thead>
+                <thead>
+                <th>Ort: </th>
+                <td><input type="text" name="ort" required></td>
+                </thead>
+                <thead>
+                <th>Datum: </th>
+                <td><input onchange="checkDate()" name="datum" type="text" id="datepicker" required></td</th>
+                </thead>
+                <thead>
+                <th>Beschreibung: </th>
+                <td><input type="text" name="beschreibung" required></textarea></td>
+                </th>
+                </thead>
+                <thead>
+                <th>
+                    <label>
+                        Art:
+                </th>
+                <td>
+                    <select name="art">
+                        <option th:each="art : ${arten}"
+                                th:value="${art.name}"
+                                th:text="${art.name}">
+                        </option>
+                    </select>
+                    </label></td></th>
+                </thead>
+            </table>
+            <input type="submit" value="Veranstaltung hinzufügen">
+        </form>
+    </div>
 </div>
 </body>
 </html>

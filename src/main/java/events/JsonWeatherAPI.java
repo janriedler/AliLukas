@@ -30,7 +30,6 @@ class JsonWeatherAPI
             if (!inline.equals("[]")) {
                 String[] words = inline.split(",");
                 String[] erg = words[1].split(":");
-                System.out.println(erg[1]);
                 return erg[1];
             } else {
                 return "Wetter außerhalb Zeitraum";
@@ -49,15 +48,11 @@ class JsonWeatherAPI
         conn.connect();
 
         int responsecode = conn.getResponseCode();
-        System.out.println("Response code is: " + responsecode);
-
         if(responsecode == 200) {
             Scanner sc = new Scanner(url.openStream());
             while(sc.hasNext()) {
                 inline += sc.nextLine();
             }
-            System.out.println("\nJSON Response in String format");
-            System.out.println(inline);
             sc.close();
         }
         conn.disconnect();

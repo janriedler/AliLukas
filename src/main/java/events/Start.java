@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,8 @@ public class Start {
     private static boolean newStart;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader bufferedReader
+                = new BufferedReader(new InputStreamReader(System.in));
         if ((newStart = checkNewInitialisation(bufferedReader))) {
             setEventTypes(bufferedReader);
             setInitialisingEvents(bufferedReader);
@@ -53,11 +55,16 @@ public class Start {
     private static void setEventTypes(BufferedReader input) throws IOException {
         String eventType;
 
-        System.out.println("Geben Sie die gewünschten EventTypen für die Veranstaltungen an.");
+        System.out.println("Geben Sie mind. einen gewünschten EventTypen für die Veranstaltungen an.");
         System.out.println("Bestätigen Sie jeweils mit Enter und geben Sie \"Quit\" ein um zu vollenden");
-        while (!(eventType = input.readLine()).equals("quit")){
+        while (!(eventType = input.readLine()).equals("quit")) {
             EventType tmp = new EventType(eventType);
             eventTypes.add(tmp);
+        }
+
+        if (eventTypes.size() == 0) {
+            System.out.println("Es wird mind. ein EventTyp benötigt!");
+            setEventTypes(input);
         }
     }
 
@@ -65,8 +72,10 @@ public class Start {
         String event;
 
         System.out.println("Geben Sie die gewünschten vorinitalisierten Events ein");
-        System.out.println("Geben sie das Event wie folgt ein: <Name> <Ort> <YYYY-DD-MM> <Beschreibung> <EventTyp>");
-        System.out.println("Bestätigen Sie jeweils mit Enter und geben Sie \"Quit\" ein um zu vollenden");
+        System.out.println("Geben sie das Event wie folgt ein: <Name> <Ort>" +
+                " <YYYY-DD-MM> <Beschreibung> <EventTyp>");
+        System.out.println("Bestätigen Sie jeweils mit Enter und geben Sie" +
+                " \"Quit\" ein um zu vollenden");
         while (!(event = input.readLine()).equals("quit")){
             String[] attributes = event.split("\\s+");
             if (checkAttributes(attributes)) {
@@ -74,7 +83,8 @@ public class Start {
                         attributes[2], attributes[3], attributes[4]);
                 events.add(tmp);
             } else {
-                System.out.println("Die Parameter des Events passen nicht!");
+                System.out.println("Die Parameter des Events passen nicht," +
+                        " evtl liegt das Datum nicht in der Zukunft!");
             }
         }
     }

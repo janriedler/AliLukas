@@ -6,12 +6,11 @@
     <link rel="stylesheet" href="style.css">
     <script language="javascript" type="text/javascript" src="script.js"></script>
     <script type="text/javascript">
-    if (screen.width <= 699) {
-    document.location = "mobile";
-    }
+        if (screen.width <= 699) {
+            document.location = "mobile";
+        }
     </script>
 </head>
-
 <body>
 <div class="sidenav">
     <a href="add">Veranstaltung hinzufügen</a><br>
@@ -23,30 +22,27 @@
 <div class="main">
     <table>
         <thead>
-
-    <th>
-        <form action="sort" method="post">
-        <label>
-            <select name="sort">
-                <option th:each="art : ${arten}"
-                        th:value="${art.name}"
-                        th:text="${art.name}">
-                </option>
-            </select>
-        </label>
-            <input type="submit" value="anzeigen">
-        </form></th>
-
-<th>
-    <form action="suche" method="post">
-        <input type="text" placeholder="Suche nach Veranstaltungen" name="entry">
-        <input type="submit" value="Suchen">
-    </form>
-</th>
+        <th>
+            <form action="sort" method="post">
+                <label>
+                    <select name="sort">
+                        <option th:each="art : ${arten}"
+                                th:value="${art.name}"
+                                th:text="${art.name}">
+                        </option>
+                    </select>
+                </label>
+                <input type="submit" value="anzeigen">
+            </form></th>
+        <th>
+            <form action="suche" method="post">
+                <input type="text" placeholder="Suche nach Veranstaltungen" name="entry">
+                <input type="submit" value="Suchen">
+            </form>
+        </th>
         </thead>
     </table>
-
-<br><br><br>
+    <br><br><br>
     <table>
         <thead>
         <th>Platz 1: GRÜN</th>
@@ -54,63 +50,46 @@
         <th>Platz 3: ROT</th>
         </thead>
     </table>
-
     <table >
         <thead >
         <tr>
-            <!--<th scope="col" class="tableKopf">ID</th>-->
             <th scope="col" class="tableKopf">Name</th>
-            <!--<th scope="col" class="tableKopf">Ort</th>
-            <th scope="col" class="tableKopf">Beschreibung</th>
-            <th scope="col" class="tableKopf">Art</th>-->
             <th scope="col" class="tableKopf">Beschreibung</th>
             <th scope="col" id="wetter" class="tableKopf">Datum</th>
             <th scope="col" id="ranking" class="tableKopf">Bewerten Sie</th>
             <th scope="col" class="tableKopf">Info</th>
         </tr>
         </thead>
-    <tbody class="category_table">
-    <tr th:if="${veranstaltungen.empty}">
-        <td colspan="2"> Leider keine Veranstaltungen vorhanden</td>
-    </tr>
-
-    <!-- ist die for Schleife von Tymeleaf, d.h. es wird der Block für alle Veranstaltungen in
-        einer übergeben Liste ausgeführt-->
-    <tr th:each="veranstaltung : ${veranstaltungen}" >
-
-        <!--<td><span th:text="${veranstaltung.id}"> id </span></td>-->
-        <td><span th:text="${veranstaltung.ver_name}"> Name </span></td>
-        <!--<td><span th:text="${veranstaltung.ort}"> Ort </span></td>-->
-        <td><span th:text="${veranstaltung.beschreibung}"> Beschreibung </span></td>
-        <!--<td><span th:text="${veranstaltung.art}"> art </span></td>-->
-        <td><span th:text="${veranstaltung.datum}"> datum </span></td>
-        <!--<td><span th:text="${veranstaltung.wetter}" id="wetter"> wetter </span></td>
-        <td><span th:text="${veranstaltung.ranking}" id="ranking"> Ranking </span></td>-->
-        <td><form action="vote" method="post">
-            <input type="hidden" th:value="${veranstaltung.id}" name="id" />
-            <input type="hidden" value="1" name="ranking" />
-            <p th:if="${!#lists.contains(upVote, veranstaltung.id)}">
-                <input type="submit" value="       gut       " th:id="${veranstaltung.id}" class="up"></form>
-            </p>
-        <form action="vote" method="post">
-            <input type="hidden" th:value="${veranstaltung.id}" name="id" />
-            <input type="hidden" value="-1"  name="ranking" />
-        <p th:if="${!#lists.contains(downVote, veranstaltung.id)}">
-            <input type="submit" value="   schlecht   " th:id="${veranstaltung.id}" class="down"></form>
-        </p>
-        </td>
-        <td><form action="event"><input type="hidden" th:value="${veranstaltung.id}" name="id">
-            <input type=submit value="Mehr anzeigen" style="width:100%"></form></td>
-    </tr>
-
+        <tbody class="category_table">
+        <tr th:if="${veranstaltungen.empty}">
+            <td colspan="2"> Leider keine Veranstaltungen vorhanden</td>
+        </tr>
+        <tr th:each="veranstaltung : ${veranstaltungen}" >
+            <td><span th:text="${veranstaltung.ver_name}"> Name </span></td>
+            <td><span th:text="${veranstaltung.beschreibung}"> Beschreibung </span></td>
+            <td><span th:text="${veranstaltung.datum}"> datum </span></td>
+            <td><form action="vote" method="post">
+                <input type="hidden" th:value="${veranstaltung.id}" name="id" />
+                <input type="hidden" value="1" name="ranking" />
+                <p th:if="${!#lists.contains(upVote, veranstaltung.id)}">
+                    <input type="submit" value="       gut       " th:id="${veranstaltung.id}" class="up"></form>
+                </p>
+                <form action="vote" method="post">
+                    <input type="hidden" th:value="${veranstaltung.id}" name="id" />
+                    <input type="hidden" value="-1"  name="ranking" />
+                    <p th:if="${!#lists.contains(downVote, veranstaltung.id)}">
+                        <input type="submit" value="   schlecht   " th:id="${veranstaltung.id}" class="down"></form>
+                </p>
+            </td>
+            <td><form action="event"><input type="hidden" th:value="${veranstaltung.id}" name="id">
+                <input type=submit value="Mehr anzeigen" style="width:100%"></form></td>
+        </tr>
         <br><br><br>
-
-    </tbody>
+        </tbody>
     </table>
     <footer>
         <p>Universität Passau © Jan, Ali, Lukas. All rights reserved (Desktop)</p>
     </footer>
 </div>
-
 </body>
 </html>

@@ -39,11 +39,6 @@ public class EventTypeRepository {
                 "select * from EventType", new VeranstaltungRowMapper()));
     }
 
-    public List<EventType> findByName(String name) {
-        return jdbcTemplate.query("SELECT * FROM EventType WHERE VER_NAME =? ",
-                new Object[] { name }, new VeranstaltungRowMapper());
-    }
-
     private int insert(EventType eventType) {
         return jdbcTemplate.update("insert into EventType " +
                         "(ver_name) " + "values(?)", eventType.getName());

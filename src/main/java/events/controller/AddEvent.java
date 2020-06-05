@@ -38,23 +38,29 @@ class AddEvent {
     @ResponseBody
     public String getQuery (@RequestParam String name, @RequestParam String ort, @RequestParam String beschreibung,
                             @RequestParam String art, @RequestParam String datum) {
-        List<Event> validate = new ArrayList<>(repository.findByName(name));
+        List<Event> validate = repository.findByName(name);
         if (validate.size() != 0) {
             return  "\"<script LANGUAGE='JavaScript'>\n" +
                     "    window.alert('Name schon vorhanden');\n" +
                     "    window.location.href='/add';\n" +
                     "    </script>\"" +
-                    "Die Name ist leider schon vergeben";
+                    "Der Name ist leider schon vergeben";
+        } else if (!EventRepository.checkDateIsInFuture(datum)) {
+            return  "\"<script LANGUAGE='JavaScript'>\n" +
+                    "    window.alert('Das Datum liegt in der Vergangenheit');\n" +
+                    "    window.location.href='/add';\n" +
+                    "    </script>\"" +
+                    "Das Datum liegt in der Vergangenheit";
+        } else {
+            Event neu = new Event(name, ort, datum, beschreibung, art);
+            repository.insert(neu);
+            return "<script>\n" +
+                    " window.setTimeout(\"location.href='/';\", 0);\n" +
+                    "</script>" +
+                    "<div>\n" +
+                    "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
+                    "</div>" +
+                    "Die Veranstaltung wurde erfolgreich hinzugefügt";
         }
-        Event neu = new Event(name, ort, datum, beschreibung, art);
-        repository.insert(neu);
-        return "<script>\n" +
-                " window.setTimeout(\"location.href='/';\", 0);\n" +
-                "</script>" +
-                "<div>\n" +
-                "    <a href=\"http://localhost:8080\">Startseite</a> <br><br><br>\n" +
-                "</div>" +
-                "Die Veranstaltung wurde erfolgreich hinzugefügt";
-
     }
 }
