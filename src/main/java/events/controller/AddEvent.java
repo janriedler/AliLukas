@@ -16,18 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-class AddDatabase {
+class AddEvent {
 
     private EventRepository repository;
-    private String name;
-    private String ort;
-    private String beschreibung;
-    private String art;
-    private String datum;
-
 
     @Autowired
-    public AddDatabase(EventRepository repository) {
+    public AddEvent(EventRepository repository) {
         this.repository = repository;
     }
 
@@ -44,11 +38,6 @@ class AddDatabase {
     @ResponseBody
     public String getQuery (@RequestParam String name, @RequestParam String ort, @RequestParam String beschreibung,
                             @RequestParam String art, @RequestParam String datum) {
-        this.name = name;
-        this.ort = ort;
-        this.beschreibung = beschreibung;
-        this.art = art;
-        this. datum = datum;
         List<Event> validate = new ArrayList<>(repository.findByName(name));
         if (validate.size() != 0) {
             return  "\"<script LANGUAGE='JavaScript'>\n" +
