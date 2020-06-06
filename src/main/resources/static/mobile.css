@@ -1,9 +1,10 @@
-nav.topmenu { 
-    height: auto; 
-    max-height:0; 
-    overflow: hidden; 
+nav.topmenu {
+    height: auto;
+    max-height: 0;
+    overflow: hidden;
     transition: all 0.5s;
 }
-#hamburg:checked + .hamburg  + nav.topmenu {
+
+#hamburg:checked+.hamburg+nav.topmenu {
     max-height: 600px;
 }

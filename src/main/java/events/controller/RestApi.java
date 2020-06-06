@@ -2,12 +2,10 @@ package events.controller;
 
 import com.google.gson.Gson;
 
-import events.Event;
-import events.Start;
-import events.EventRepository;
+import events.repository.Event;
+import events.repository.EventRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,16 +25,12 @@ public class RestAPI {
 
     @GetMapping("events")
     @ResponseBody
-    public String json(@RequestParam String n) {
+    public String json(@RequestParam String sizeString) {
         List<Event> events = repository.findAllSort();
-        int size = Integer.parseInt(n);
+        int size = Integer.parseInt(sizeString);
         while (events.size() > size) {
             events.remove(0);
         }
         return new Gson().toJson(events);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Start.class, args);
     }
 }

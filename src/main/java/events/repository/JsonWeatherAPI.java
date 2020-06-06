@@ -1,4 +1,4 @@
-package events;
+package events.repository;
 
 import java.net.HttpURLConnection;
 import java.net.URL;

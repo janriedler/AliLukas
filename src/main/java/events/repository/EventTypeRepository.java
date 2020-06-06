@@ -1,4 +1,6 @@
-package events;
+package events.repository;
+
+import events.Start;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +28,13 @@ public class EventTypeRepository {
         }
     }
 
+    private void fetchEventTypes() {
+        List<EventType> eventTypes = Start.getEventTypes();
+        for (EventType eventType: eventTypes) {
+            insert(eventType);
+        }
+    }
+
     class VeranstaltungRowMapper implements RowMapper<EventType> {
 
         @Override
@@ -46,13 +55,6 @@ public class EventTypeRepository {
 
     private int deleteAll() {
         return jdbcTemplate.update( "delete from EventType");
-    }
-
-    private void fetchEventTypes() {
-        List<EventType> eventTypes = Start.getEventTypes();
-        for (EventType eventType: eventTypes) {
-            insert(eventType);
-        }
     }
 }
 

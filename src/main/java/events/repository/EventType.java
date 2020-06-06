@@ -1,4 +1,4 @@
-package events;
+package events.repository;
 
 public class EventType {
 

@@ -6,7 +6,6 @@
     <title>Veranstaltung</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script language="javascript" type="application/javascript" src="script.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type="text/javascript">
@@ -34,7 +33,7 @@
                 </thead>
                 <thead>
                 <th>Ort: </th>
-                <td><input type="text" name="ort" required></td>
+                <td><input type="text" name="place" required></td>
                 </thead>
                 <thead>
                 <th>Datum: </th>
@@ -42,7 +41,7 @@
                 </thead>
                 <thead>
                 <th>Beschreibung: </th>
-                <td><input type="text" name="beschreibung" required></textarea></td>
+                <td><input type="text" name="description" required></textarea></td>
                 </th>
                 </thead>
                 <thead>
@@ -51,10 +50,10 @@
                         Art:
                 </th>
                 <td>
-                    <select name="art">
-                        <option th:each="art : ${arten}"
-                                th:value="${art.name}"
-                                th:text="${art.name}">
+                    <select name="eventType">
+                        <option th:each="eventType : ${eventTypes}"
+                                th:value="${eventType.name}"
+                                th:text="${eventType.name}">
                         </option>
                     </select>
                     </label></td></th>

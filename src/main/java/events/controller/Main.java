@@ -1,13 +1,11 @@
 package events.controller;
 
-import events.Event;
-import events.EventRepository;
-import events.EventType;
-import events.EventTypeRepository;
-import events.Start;
+import events.repository.Event;
+import events.repository.EventRepository;
+import events.repository.EventType;
+import events.repository.EventTypeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +31,6 @@ class Main {
     public Main(EventRepository eventRepository, EventTypeRepository eventTypeRepository) {
         this.eventRepository = eventRepository;
         this.eventTypeRepository = eventTypeRepository;
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Start.class, args);
     }
 
     /**
@@ -67,7 +61,7 @@ class Main {
      */
     @GetMapping("add")
     public String addEvent(Model model) {
-        model.addAttribute("arten", eventTypeRepository.findAll());
+        model.addAttribute("eventTypes", eventTypeRepository.findAll());
         return "add";
     }
 
@@ -101,7 +95,7 @@ class Main {
         List<Event> searchedEvents = new ArrayList<>();
         for (Event Event : eventRepository.findAllSort()) {
             if (Event.getVer_name().toLowerCase().contains(entry.toLowerCase()) ||
-                    Event.getOrt().toLowerCase().contains(entry.toLowerCase())) {
+                    Event.getPlace().toLowerCase().contains(entry.toLowerCase())) {
                 searchedEvents.add(Event);
             }
         }
@@ -149,7 +143,7 @@ class Main {
     }
 
     private void doPreparations(HttpServletRequest request, List<Event> events, Model model) {
-        last20(events);
+        getLast20(events);
         setEventTypes(model);
         ArrayList<Long> upVote = new ArrayList<>();
         ArrayList<Long> downVote = new ArrayList<>();
@@ -158,7 +152,7 @@ class Main {
         model.addAttribute("upVote", upVote);
         model.addAttribute("downVote", downVote);
         model.addAttribute("top3", getTop3());
-        model.addAttribute("veranstaltungen", events);
+        model.addAttribute("events", events);
     }
 
     private void setUpDownVoteLists(HttpServletRequest request, ArrayList<Long> upVote, ArrayList<Long> downVote) {
@@ -177,7 +171,7 @@ class Main {
     private void setEventTypes(Model model) {
         List<EventType> eventTypes = eventTypeRepository.findAll();
         eventTypes.add(0, new EventType("Alle (auch Vergangenheit)"));
-        model.addAttribute("arten", eventTypes);
+        model.addAttribute("eventTypes", eventTypes);
     }
 
     /**
@@ -210,7 +204,7 @@ class Main {
         return eventRepository.findAllSort().subList(0, 3);
     }
 
-    private void last20(List<Event> events) {
+    private void getLast20(List<Event> events) {
         while (events.size() > 20) {
             events.remove(0);
         }
