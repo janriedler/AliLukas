@@ -12,6 +12,10 @@
     <a href="/"  style="color:white;">Top 3 Events:</a>
     <tr th:each="event : ${top3}" class="centerMe">
         <span th:text="${event.ver_name}" class="centerMe" style="color:white; font-size:23px;" > Name </span>
+    </tr>
+        <footer>
+            <p style="color:white;">Universität Passau © Jan, Ali, Lukas. <br>All rights reserved (Mobile)</p>
+        </footer>
 </div>
 <div class="main">
     <table>
@@ -81,9 +85,7 @@
         <br><br><br>
         </tbody>
     </table>
-    <footer>
-        <p>Universität Passau © Jan, Ali, Lukas. All rights reserved (Desktop)</p>
-    </footer>
+
 </div>
 </body>
 </html>
