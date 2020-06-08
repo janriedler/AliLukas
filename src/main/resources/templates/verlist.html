@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="style.css">
-    <script type="text/javascript">
-        if (screen.width <= 699) {
-            document.location = "mobile";
-        }
-    </script>
 </head>
 <body>
 <div class="sidenav">
     <a href="add">Veranstaltung hinzufügen</a><br>
     <a href="/">Startseite</a> <br><br><br><br><br><br>
-    <a href="/"  style="color:white;">Top 3 Events:</a>
+    <a style="color:white;">Top 3 Events:</a>
     <tr th:each="event : ${top3}" class="centerMe">
         <span th:text="${event.ver_name}" class="centerMe" style="color:white; font-size:23px;" > Name </span>
+    </tr>
+        <footer id="mobileFooter" hidden="true">
+            <p style="color:white;">Universität Passau © Jan, Ali, Lukas. <br>All rights reserved (Mobile)</p>
+        </footer>
 </div>
 <div class="main">
     <table>
@@ -32,9 +31,10 @@
                     </select>
                 </label>
                 <input type="submit" value="anzeigen">
-            </form></th>
+            </form>
+        </th>
         <th>
-            <form action="suche" method="post">
+            <form action="search" method="post">
                 <input type="text" placeholder="Suche nach Veranstaltungen" name="entry">
                 <input type="submit" value="Suchen">
             </form>
@@ -68,17 +68,19 @@
             <td><span th:text="${event.description}"> Beschreibung </span></td>
             <td><span th:text="${event.datum}"> datum </span></td>
             <td><form action="vote" method="post">
-                <input type="hidden" th:value="${event.id}" name="id" />
-                <input type="hidden" value="1" name="ranking" />
-                <p th:if="${!#lists.contains(upVote, event.id)}">
-                    <input type="submit" value="       gut       " th:id="${event.id}" class="up"></form>
-                </p>
+                    <input type="hidden" th:value="${event.id}" name="id" />
+                    <input type="hidden" value="1" name="ranking" />
+                    <p th:if="${!#lists.contains(upVote, event.id)}">
+                        <input type="submit" value="       gut       " th:id="${event.id}" class="up">
+                    </p>
+                </form>
                 <form action="vote" method="post">
                     <input type="hidden" th:value="${event.id}" name="id" />
                     <input type="hidden" value="-1"  name="ranking" />
                     <p th:if="${!#lists.contains(downVote, event.id)}">
-                        <input type="submit" value="   schlecht   " th:id="${event.id}" class="down"></form>
-                </p>
+                        <input type="submit" value="   schlecht   " th:id="${event.id}" class="down">
+                    </p>
+                </form>
             </td>
             <td><form action="event"><input type="hidden" th:value="${event.id}" name="id">
                 <input type=submit value="Mehr anzeigen" style="width:100%"></form></td>
@@ -86,9 +88,16 @@
         <br><br><br>
         </tbody>
     </table>
-    <footer>
+    <footer id="verlistFooter" hidden="true">
         <p>Universität Passau © Jan, Ali, Lukas. All rights reserved (Desktop)</p>
     </footer>
 </div>
+<script type="text/javascript">
+    if (screen.width <= 699) {
+        document.getElementById('mobileFooter').hidden = false;
+    } else {
+        document.getElementById('verlistFooter').hidden = false;
+    }
+</script>
 </body>
 </html>

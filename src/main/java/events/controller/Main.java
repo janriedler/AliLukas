@@ -90,7 +90,7 @@ class Main {
      * Dies wird dann wieder an die Startseite gesendet --> Jetzt wird dort nur noch Veranstaltungen gezeigt die die
      * Suche entahlten
      */
-    @RequestMapping("suche")
+    @RequestMapping("search")
     public String showAllWithSearch(HttpServletRequest request, Model model, @RequestParam String entry) {
         List<Event> searchedEvents = new ArrayList<>();
         for (Event Event : eventRepository.findAllSort()) {
@@ -120,19 +120,6 @@ class Main {
                 "    </script>\"" +
                 "Vielen Dank für deinen Vote";
     }
-
-    @RequestMapping("mobile")
-    public String showMobile(HttpServletRequest request, Model model) {
-        List<Event> events = new ArrayList<>();
-        for (Event event: eventRepository.findAllSort()) {
-            if (EventRepository.checkDateIsInFuture(event.getDatum())) {
-                events.add(event);
-            }
-        }
-        doPreparations(request, events, model);
-        return "mobile";
-    }
-
 
     @RequestMapping("event")
     public String showEvent(HttpServletRequest request, Model model, @RequestParam String id) {
