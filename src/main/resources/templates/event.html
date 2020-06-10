@@ -74,17 +74,25 @@
             <td><span th:text="${event.weather}" id="wetter"> wetter </span></td>
             <td><span th:text="${event.rank}" id="ranking"> Ranking </span></td>
             <td><form action="vote" method="post">
-                <input type="hidden" th:value="${event.id}" name="id" />
-                <input type="hidden" value="1" name="ranking" />
-                <p th:if="${!#lists.contains(upVote, event.id)}">
-                    <input type="submit" value="       gut       " th:id="${event.id}" class="up"></form>
-                </p>
+                    <input type="hidden" th:value="${event.id}" name="id" />
+                    <input type="hidden" value="1" name="ranking" />
+                    <p th:if="${!#lists.contains(upVote, event.id)}">
+                        <input type="submit" value="       gut       " th:id="${event.id}" class="first">
+                    </p>
+                    <p th:if="${#lists.contains(upVote, event.id)}">
+                        <input type="submit" value="       gut       " th:id="${event.id}" class="second">
+                    </p>
+                </form>
                 <form action="vote" method="post">
                     <input type="hidden" th:value="${event.id}" name="id" />
                     <input type="hidden" value="-1"  name="ranking" />
                     <p th:if="${!#lists.contains(downVote, event.id)}">
-                        <input type="submit" value="   schlecht   " th:id="${event.id}" class="down"></form>
-                </p>
+                        <input type="submit"  value="   schlecht   " th:id="${event.id}" class="first">
+                    </p>
+                    <p th:if="${#lists.contains(downVote, event.id)}">
+                        <input type="submit"  value="   schlecht   " th:id="${event.id}" class="second">
+                    </p>
+                </form>
             </td>
         </tr>
         <br><br><br>

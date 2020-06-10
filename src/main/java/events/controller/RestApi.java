@@ -2,8 +2,8 @@ package events.controller;
 
 import com.google.gson.Gson;
 
-import events.repository.Event;
-import events.repository.EventRepository;
+import events.data_access_layer.data_access_objects.Event;
+import events.data_access_layer.repository.EventRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

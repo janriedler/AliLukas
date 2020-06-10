@@ -1,7 +1,9 @@
-package events.repository;
+package events.data_access_layer.repository;
 
 import events.Start;
 
+import events.data_access_layer.JsonWeatherAPI;
+import events.data_access_layer.data_access_objects.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

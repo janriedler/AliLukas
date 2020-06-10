@@ -1,9 +1,9 @@
 package events.controller;
 
-import events.repository.EventRepository;
-import events.repository.Event;
-import events.repository.EventType;
-import events.repository.EventTypeRepository;
+import events.data_access_layer.repository.EventRepository;
+import events.data_access_layer.data_access_objects.Event;
+import events.data_access_layer.data_access_objects.EventType;
+import events.data_access_layer.repository.EventTypeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -67,7 +67,7 @@ class Add {
     }
 
     private String checkName(String name) {
-        if (eventRepository.findByName(name).size() != 0){
+        if (!eventRepository.findByName(name).isEmpty()){
             return  "\"<script LANGUAGE='JavaScript'>\n" +
                     "    window.alert('Name schon vorhanden');\n" +
                     "    window.location.href='/add';\n" +
@@ -84,10 +84,10 @@ class Add {
             }
         }
         return "\"<script LANGUAGE='JavaScript'>\n" +
-                "    window.alert('Illegaler Eventtyp!');\n" +
+                "    window.alert('Eventtyp ist nicht vorhanden!');\n" +
                 "    window.location.href='/add';\n" +
                 "    </script>\"" +
-                "Illegaler Eventtyp!";
+                "Eventtyp ist nicht vorhanden!";
     }
 
     private String insert(String name, String place, String datum, String description, String eventType) {

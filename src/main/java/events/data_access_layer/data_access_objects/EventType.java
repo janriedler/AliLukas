@@ -1,4 +1,4 @@
-package events.repository;
+package events.data_access_layer.data_access_objects;
 
 public class EventType {
 

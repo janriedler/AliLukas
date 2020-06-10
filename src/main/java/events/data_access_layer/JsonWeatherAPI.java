@@ -1,13 +1,13 @@
-package events.repository;
+package events.data_access_layer;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.IOException;
 import java.util.Scanner;
 
-class JsonWeatherAPI
+public class JsonWeatherAPI
 {
-    static String getWoeid(String city)
+    public static String getWoeid(String city)
     {
         try {
             String inline = useAPI("https://www.metaweather.com/api/location/search/?query=" + city);
@@ -22,7 +22,7 @@ class JsonWeatherAPI
         return null;
     }
 
-    static String getWeather(String id, String datum) {
+    public static String getWeather(String id, String datum) {
         String[] zahl = datum.split("-");
         datum = zahl[0] + "/" + zahl[1] + "/" + zahl[2];
         try {

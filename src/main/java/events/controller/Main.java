@@ -1,9 +1,9 @@
 package events.controller;
 
-import events.repository.Event;
-import events.repository.EventRepository;
-import events.repository.EventType;
-import events.repository.EventTypeRepository;
+import events.data_access_layer.data_access_objects.Event;
+import events.data_access_layer.repository.EventRepository;
+import events.data_access_layer.data_access_objects.EventType;
+import events.data_access_layer.repository.EventTypeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -108,17 +108,27 @@ class Main {
     public String vote (HttpServletRequest request, HttpServletResponse response, @RequestParam String id, @RequestParam String ranking) {
         int value = Integer.parseInt(ranking);
         if (Math.abs(value) == 1) {
-            value += votingChanged(request, id);
-
+            int oldVoting = getOldVoting(request, id);
+            if (oldVoting == value) {
+                response.addCookie(new Cookie(id, "0"));
+                value = -1 * oldVoting;
+            } else {
+                response.addCookie(new Cookie(id, ranking));
+                value += -1 * oldVoting;
+            }
             long tmp = Long.parseLong(id);
             eventRepository.vote(tmp, value);
-            response.addCookie(new Cookie(id, ranking));
+            return "\"<script LANGUAGE='JavaScript'>\n" +
+                    "    window.alert('Vielen Dank für deinen Vote');\n" +
+                    "    window.location.href='/';\n" +
+                    "    </script>\"" +
+                    "Vielen Dank für deinen Vote";
         }
-        return  "\"<script LANGUAGE='JavaScript'>\n" +
-                "    window.alert('Vielen Dank für deinen Vote');\n" +
+        return "\"<script LANGUAGE='JavaScript'>\n" +
+                "    window.alert('Etwas ist mit der Session schief gelaufen!');\n" +
                 "    window.location.href='/';\n" +
                 "    </script>\"" +
-                "Vielen Dank für deinen Vote";
+                "Etwas ist mit der Session schief gelaufen!";
     }
 
     @RequestMapping("event")
@@ -148,7 +158,7 @@ class Main {
             for (Cookie cookie: cookies) {
                 if (cookie.getValue().equals("1")) {
                     upVote.add(Long.parseLong(cookie.getName()));
-                } else {
+                } else if (cookie.getValue().equals("-1")){
                     downVote.add(Long.parseLong(cookie.getName()));
                 }
             }
@@ -161,11 +171,8 @@ class Main {
         model.addAttribute("eventTypes", eventTypes);
     }
 
-    /**
-     * Fetches the old Voting and returns the voting value that needs to
-     * be undone.
-     */
-    private int votingChanged(HttpServletRequest request, String id) {
+
+    private int getOldVoting(HttpServletRequest request, String id) {
         Cookie[] cookies = request.getCookies();
         Cookie voted = null;
         if (cookies != null) {
@@ -178,7 +185,7 @@ class Main {
         if (voted != null) {
             int votedValue = Integer.parseInt(voted.getValue());
             if (Math.abs(votedValue) == 1) {
-                return -1 * votedValue;
+                return votedValue;
             }
         }
         return 0;
